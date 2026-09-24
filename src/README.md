@@ -1,7 +1,7 @@
 <h1 align="center">🧰 Source</h1>
 
 <p align="center">
-  <em>The DiffCarve CLI. Right now it parses arguments and not much else.</em>
+  <em>The DiffCarve CLI. It reads a branch's diff from git and cuts it into import-ordered layers.</em>
 </p>
 
 <p align="center">
@@ -14,9 +14,10 @@
 | File | What it does |
 |:---|:---|
 | [**cli.ts**](cli.ts) | The `diffcarve` bin entry. Hands `argv` to `run()` and sets the exit code. |
-| [**run.ts**](run.ts) | Command dispatch. Takes an `io` pair instead of writing to `process` directly, so tests can call it. |
+| [**run.ts**](run.ts) | Command dispatch and output formatting. Takes an `io` pair and a `cwd` instead of touching `process`, so tests can call it. |
+| [**analyze.ts**](analyze.ts) | `analyze(cwd, branch)` lists the branch's changes since its merge base, builds an in-memory ts-morph import graph over the changed TS/JS files, and `layer()` orders them into layers (import cycles share one). |
 
-Tests live in [`../test/`](../test/cli.test.ts) and import these files directly; Node strips
+Tests live in [`../test/`](../test/) and import these files directly; Node strips
 the types at runtime, so there's no build step before `npm test`.
 
 ---
