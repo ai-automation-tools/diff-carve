@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Added**
+- `diffcarve analyze <branch>` builds a ts-morph import graph over the files a branch changes since its merge base with HEAD and prints dependency-ordered layers, with each file's imports, the files outside the graph, and the analysis time. Import cycles share a layer. Empty and one-file diffs say there's nothing to partition and exit 0. *Build: Slice 0a*
+
 ## 2026-09-22
 
 **Added**

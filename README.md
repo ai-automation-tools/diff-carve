@@ -34,10 +34,10 @@
 ---
 
 > [!WARNING]
-> **Nothing is carved yet.** This is the scaffold. The CLI answers `--help` and
-> `--version`; `analyze` says it isn't built. The first real work is a spike that runs the
-> analyzer against ten real oversized PRs, and if fewer than half come out sensible, the
-> project stops there. See the [roadmap](docs/ROADMAP.md).
+> **Spike stage.** `diffcarve analyze <branch>` prints dependency-ordered layers, and that's
+> all it does so far: no score, no config, no Action. Next it runs against ten real
+> oversized PRs, and if fewer than half come out sensible, the project stops there. See the
+> [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
 
@@ -50,11 +50,11 @@ later layer. Each layer gets a reviewability score, so you know which ones to sk
 It runs as a CLI on your machine or as a GitHub Action in your own CI. There's no
 DiffCarve server, and your source code never leaves the runner.
 
-## 📊 Planned features
+## 📊 Features
 
 | Feature | Status |
 |:---|:---|
-| **`diffcarve analyze <branch>`** | Slice 0. Dependency-ordered layers from a ts-morph import graph |
+| **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports; `paths` aliases not yet) |
 | **Reviewability score** | Slice 1. Lines, files, complexity delta, reverse dependencies, shown per layer |
 | **`--dry-run`** | Slice 1. The proposed stack as a PR comment, blocking nothing |
 | **`diffcarve.yml`** | Slice 2. Line budget, trigger threshold, per-language boundary rules |
@@ -70,8 +70,9 @@ npm install
 # 2. Build the CLI into dist/
 npm run build
 
-# 3. Run it
-node dist/cli.js --help
+# 3. Carve a branch. Run it from the branch the PR targets:
+#    it diffs <branch> against its merge base with HEAD.
+node dist/cli.js analyze my-feature-branch
 
 # 4. Tests and lint
 npm test && npm run lint
@@ -83,7 +84,7 @@ npm test && npm run lint
 |:---|:---|
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
-| [**🧪 test/**](test/cli.test.ts) | Tests for `node --test`, run straight from TypeScript. |
+| [**🧪 test/**](test/) | Tests for `node --test`, run straight from TypeScript. |
 | [**🤖 CLAUDE.md**](CLAUDE.md) | Standing orders for the agent that works the roadmap each week. |
 
 ---
