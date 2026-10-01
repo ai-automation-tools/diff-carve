@@ -35,9 +35,9 @@
 
 > [!WARNING]
 > **Spike stage.** `diffcarve analyze <branch>` prints dependency-ordered layers, and that's
-> all it does so far: no score, no config, no Action. Next it runs against ten real
-> oversized PRs, and if fewer than half come out sensible, the project stops there. See the
-> [roadmap](docs/ROADMAP.md).
+> all it does so far: no score, no config, no Action. It has been run on ten real oversized
+> PRs ([results](docs/SPIKE_RESULTS.md)) and is waiting on a human verdict: if half or fewer
+> come out sensible, the project stops there. See the [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
 
