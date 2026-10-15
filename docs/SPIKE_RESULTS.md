@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/verdict-awaiting_Mike-F59E0B?style=for-the-badge" alt="Verdict: awaiting Mike">
+  <img src="https://img.shields.io/badge/verdict-6_of_10_sensible-2ea44f?style=for-the-badge" alt="Verdict: 6 of 10 sensible">
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/plan-ROADMAP-8B5CF6?style=for-the-badge" alt="Roadmap"></a>
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs-6B7280?style=for-the-badge" alt="Docs home"></a>
 </p>
@@ -16,28 +16,29 @@ This is roadmap item *Slice 0b*. The spec's bar: at least 7 of 10 layer breakdow
 sensible, meaning files grouped by real dependency, not by line count. At 5 or fewer, the
 decision memo's falsifier fires and DiffCarve gets parked.
 
-The verdicts below are **proposals** written by the roadmap agent on 2026-09-30. The real
-verdict is Mike's: fill in the *Mike* column, then tick the sign-off item in the
-[roadmap](ROADMAP.md).
+The verdicts below were proposed by the roadmap agent on 2026-09-30. Mike signed off on
+them as they stand on 2026-10-12 ([OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)), so the *Mike*
+column repeats them. 6 of 10 is under the 7-of-10 bar but over the falsifier's 5: the spike
+gate is lifted and path-alias resolution goes on as ordinary roadmap work.
 
 ## Summary
 
-**Proposed: 6 of 10 sensible.** That's under the 7-of-10 bar and over the falsifier's 5.
+**Signed off: 6 of 10 sensible.** That's under the 7-of-10 bar and over the falsifier's 5.
 Three of the four misses have one cause, unresolved path aliases (see
 [What the misses have in common](#what-the-misses-have-in-common)).
 
 | # | PR | Lines | Files | Layers | Time | Proposed | Mike |
 |:--|:---|--:|--:|--:|--:|:--|:--|
-| 1 | [microsoft/vscode#338333](https://github.com/microsoft/vscode/pull/338333) | 740 | 17 | 4 | 2.29s | Sensible |  |
-| 2 | [microsoft/vscode#336254](https://github.com/microsoft/vscode/pull/336254) | 614 | 13 | 4 | 1.32s | Sensible |  |
-| 3 | [github/gh-aw-firewall#9303](https://github.com/github/gh-aw-firewall/pull/9303) | 732 | 27 | 7 | 1.64s | Sensible |  |
-| 4 | [github/gh-aw-firewall#9220](https://github.com/github/gh-aw-firewall/pull/9220) | 669 | 12 | 3 | 1.25s | Sensible |  |
-| 5 | [kentcdodds/mediarss#128](https://github.com/kentcdodds/mediarss/pull/128) | 534 | 7 | 2 | 1.02s | Arbitrary |  |
-| 6 | [Azure/Azurite#2740](https://github.com/Azure/Azurite/pull/2740) | 461 | 7 | 2 | 0.86s | Sensible |  |
-| 7 | [daraskme/Nextcloud-flare#25](https://github.com/daraskme/Nextcloud-flare/pull/25) | 2338 | 21 | 7 | 1.46s | Sensible |  |
-| 8 | [lalligood10/Battleship#28](https://github.com/lalligood10/Battleship/pull/28) | 1268 | 26 | 6 | 1.90s | Arbitrary |  |
-| 9 | [anishthite/devin-takehome#4](https://github.com/anishthite/devin-takehome/pull/4) | 2549 | 36 | 6 | 2.24s | Arbitrary |  |
-| 10 | [xpadev-net/video-host#60](https://github.com/xpadev-net/video-host/pull/60) | 1270 | 16 | 2 | 1.38s | Arbitrary |  |
+| 1 | [microsoft/vscode#338333](https://github.com/microsoft/vscode/pull/338333) | 740 | 17 | 4 | 2.29s | Sensible | Sensible |
+| 2 | [microsoft/vscode#336254](https://github.com/microsoft/vscode/pull/336254) | 614 | 13 | 4 | 1.32s | Sensible | Sensible |
+| 3 | [github/gh-aw-firewall#9303](https://github.com/github/gh-aw-firewall/pull/9303) | 732 | 27 | 7 | 1.64s | Sensible | Sensible |
+| 4 | [github/gh-aw-firewall#9220](https://github.com/github/gh-aw-firewall/pull/9220) | 669 | 12 | 3 | 1.25s | Sensible | Sensible |
+| 5 | [kentcdodds/mediarss#128](https://github.com/kentcdodds/mediarss/pull/128) | 534 | 7 | 2 | 1.02s | Arbitrary | Arbitrary |
+| 6 | [Azure/Azurite#2740](https://github.com/Azure/Azurite/pull/2740) | 461 | 7 | 2 | 0.86s | Sensible | Sensible |
+| 7 | [daraskme/Nextcloud-flare#25](https://github.com/daraskme/Nextcloud-flare/pull/25) | 2338 | 21 | 7 | 1.46s | Sensible | Sensible |
+| 8 | [lalligood10/Battleship#28](https://github.com/lalligood10/Battleship/pull/28) | 1268 | 26 | 6 | 1.90s | Arbitrary | Arbitrary |
+| 9 | [anishthite/devin-takehome#4](https://github.com/anishthite/devin-takehome/pull/4) | 2549 | 36 | 6 | 2.24s | Arbitrary | Arbitrary |
+| 10 | [xpadev-net/video-host#60](https://github.com/xpadev-net/video-host/pull/60) | 1270 | 16 | 2 | 1.38s | Arbitrary | Arbitrary |
 
 Every PR was opened by an AI coding agent (GitHub Copilot's coding agent for the
 Microsoft, GitHub and Azure repos, Devin for the rest), merged, public, and over 400
@@ -76,8 +77,8 @@ Nothing from those repos is vendored here. The file lists below are paths only.
   but they read oddly next to the foundation code.
 
 If the alias resolver is fixed and the spike re-run, #5, #9 and #10 are likely to flip,
-which would put the count at 8 or 9. Whether to do that before sign-off is an open
-question in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md).
+which would put the count at 8 or 9. Mike chose to sign off without that re-run; the
+resolver fix is left to ordinary roadmap work.
 
 ## Layer breakdowns
 

@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- Spike signed off: Mike accepted the results as they stand, 6 of 10 sensible (2026-10-12). `SPIKE_RESULTS.md` records the verdicts and the spike gate is lifted. *Build: spike sign-off*
 - `docs/SPIKE_RESULTS.md`: `diffcarve analyze` run on ten public, merged, AI-written PRs over 400 lines, with every layer breakdown, analysis times (all under 2.3s), and a proposed verdict per PR: 6 of 10 sensible, three of the misses from unresolved path aliases. Awaiting Mike's sign-off. *Build: Slice 0b*
 - `docs/OPEN-QUESTIONS.md`, where the roadmap agent asks Mike for decisions.
 
