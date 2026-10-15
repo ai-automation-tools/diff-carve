@@ -21,6 +21,9 @@ them as they stand on 2026-10-12 ([OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)), so th
 column repeats them. 6 of 10 is under the 7-of-10 bar but over the falsifier's 5: the spike
 gate is lifted and path-alias resolution goes on as ordinary roadmap work.
 
+Slice 1 re-ran the same ten PRs with the reviewability score; see
+[Slice 1: does the score agree with the verdicts?](#slice-1-does-the-score-agree-with-the-verdicts).
+
 ## Summary
 
 **Signed off: 6 of 10 sensible.** That's under the 7-of-10 bar and over the falsifier's 5.
@@ -79,6 +82,46 @@ Nothing from those repos is vendored here. The file lists below are paths only.
 If the alias resolver is fixed and the spike re-run, #5, #9 and #10 are likely to flip,
 which would put the count at 8 or 9. Mike chose to sign off without that re-run; the
 resolver fix is left to ordinary roadmap work.
+
+## Slice 1: does the score agree with the verdicts?
+
+Re-run on 2026-10-14 with the Slice 1 CLI (`node src/cli.ts analyze pr`, same scratch-repo
+method), which scores each layer out of 100 and passes it at 50 or more. Every PR gave the
+same layers as above. A PR's score passes when every one of its layers passes.
+
+| # | Layer scores, in order (❌ under 50) | Score says | Verdict | Agree? |
+|:--|:--|:--|:--|:--|
+| 1 | 73 · 34❌ · 54 · 94 | Fail | Sensible | No |
+| 2 | 77 · 61 · 83 · 52 | Pass | Sensible | Yes |
+| 3 | 70 · 59 · 76 · 81 · 95 · 95 · 94 | Pass | Sensible | Yes |
+| 4 | 66 · 41❌ · 77 | Fail | Sensible | No |
+| 5 | 82 · 83 | Pass | Arbitrary | No |
+| 6 | 92 · 54 | Pass | Sensible | Yes |
+| 7 | 94 · 88 · 75 · 22❌ · 23❌ · 73 · 57 | Fail | Sensible | No |
+| 8 | 65 · 63 · 26❌ · 26❌ · 76 · 97 | Fail | Arbitrary | Yes |
+| 9 | 7❌ · 14❌ · 44❌ · 62 · 26❌ · 55 | Fail | Arbitrary | Yes |
+| 10 | 22❌ · 96 | Fail | Arbitrary | Yes |
+
+**6 of 10 agree.** Three of the four arbitrary splits fail, and three of the six sensible
+ones pass. Analysis took 1.6 to 5.4 seconds per PR, slower than Slice 0 because the
+complexity delta reads every changed file at the merge base too, and still far inside 60.
+
+The disagreements are two different things:
+
+- **Sensible order, oversized layer (#1, #4, #7).** The verdict judged the cut; the score
+  judges whether each piece is small enough to review. #7's layer 5 is 1,333 lines with
+  +128 complexity, and #1's layer 2 adds 54 branch points in 286 lines. Those layers really
+  are too big for one review, so the score is doing its job here. They're the case for
+  splitting a layer further, which import order alone can't do.
+- **Arbitrary order, small layers (#5).** The helper shares a layer with the routes that
+  import it because the `#app/...` alias isn't resolved. The score sees two small layers and
+  passes them. It measures size, not whether an edge is missing, so it can't catch an
+  analyzer miss. Path-alias resolution is the fix for #5, #9 and #10, not the score.
+
+One thing to watch: lines dominate less than they might. #6's layer 2 is 454 lines of tests
+and still passes at 54, because it touches three files with no reverse dependencies. The
+weights and budgets move into `diffcarve.yml` in Slice 2, so a repo that wants lines to
+weigh more can say so.
 
 ## Layer breakdowns
 

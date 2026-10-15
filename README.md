@@ -34,10 +34,11 @@
 ---
 
 > [!WARNING]
-> **Spike stage.** `diffcarve analyze <branch>` prints dependency-ordered layers, and that's
-> all it does so far: no score, no config, no Action. On ten real oversized PRs it came out
-> sensible on 6 ([results](docs/SPIKE_RESULTS.md)), which was signed off as enough to keep
-> building. See the [roadmap](docs/ROADMAP.md).
+> **Early CLI.** `diffcarve analyze <branch>` prints dependency-ordered layers with a
+> reviewability score on each, and `--dry-run` prints the same thing as a PR comment.
+> No config file and no Action yet. On ten real oversized PRs the layers came out sensible
+> on 6 ([results](docs/SPIKE_RESULTS.md)), signed off as enough to keep building. See the
+> [roadmap](docs/ROADMAP.md).
 
 ## 💡 What it's for
 
@@ -55,8 +56,8 @@ DiffCarve server, and your source code never leaves the runner.
 | Feature | Status |
 |:---|:---|
 | **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports; `paths` aliases not yet) |
-| **Reviewability score** | Slice 1. Lines, files, complexity delta, reverse dependencies, shown per layer |
-| **`--dry-run`** | Slice 1. The proposed stack as a PR comment, blocking nothing |
+| **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50, with the lines, files, complexity delta and reverse dependencies behind it |
+| **`--dry-run`** | ✅ Built. Prints the proposed stack as PR-comment markdown; posting it is the Action's job (Slice 3) |
 | **`diffcarve.yml`** | Slice 2. Line budget, trigger threshold, per-language boundary rules |
 | **GitHub Action** | Slice 3. Stays silent under the threshold, comments over it |
 | **Stacked PR chains, merge gate, Python** | After public release |
@@ -74,7 +75,10 @@ npm run build
 #    it diffs <branch> against its merge base with HEAD.
 node dist/cli.js analyze my-feature-branch
 
-# 4. Tests and lint
+# 4. The same stack as the markdown a PR comment would carry
+node dist/cli.js analyze my-feature-branch --dry-run
+
+# 5. Tests and lint
 npm test && npm run lint
 ```
 

@@ -20,7 +20,7 @@
 |:---|:---|
 | [**🗺️ ROADMAP.md**](ROADMAP.md) | The release gates, one per weekly run, plus what waits until after the repo goes public. |
 | [**📋 CHANGELOG.md**](CHANGELOG.md) | Every change, newest first. Roadmap items show up here the week they're ticked. |
-| [**🔬 SPIKE_RESULTS.md**](SPIKE_RESULTS.md) | Ten real AI-written PRs carved by the analyzer, with a proposed sensible/arbitrary verdict for each. |
+| [**🔬 SPIKE_RESULTS.md**](SPIKE_RESULTS.md) | Ten real AI-written PRs carved by the analyzer, the signed-off verdict for each (6 of 10 sensible), and how the Slice 1 score lines up with them. |
 | [**❓ OPEN-QUESTIONS.md**](OPEN-QUESTIONS.md) | Decisions the roadmap agent is waiting on Mike for. |
 
 ## 📦 Product

@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import { Project, ts } from "ts-morph";
+import { complexity } from "./score.ts";
 
 export type Analysis = {
   branch: string;
@@ -12,6 +13,10 @@ export type Analysis = {
   outside: string[];
   // Import edges between changed files, importer -> imported.
   imports: Map<string, string[]>;
+  // Lines added plus deleted, per changed file. Binary files count 0.
+  lines: Map<string, number>;
+  // Branch points after the change minus before it, per file in the graph.
+  complexity: Map<string, number>;
 };
 
 const CODE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
@@ -26,8 +31,14 @@ export function analyze(cwd: string, branch: string): Analysis {
   const mergeBase = git(cwd, ["merge-base", "HEAD", branch]).trim();
   const status = git(cwd, ["diff", "--name-status", "--no-renames", "-z", mergeBase, branch]).split("\0");
   status.pop(); // trailing NUL
+  const lines = new Map<string, number>();
+  for (const row of git(cwd, ["diff", "--numstat", "--no-renames", "-z", mergeBase, branch]).split("\0")) {
+    const [added, deleted, path] = row.split("\t");
+    if (path) lines.set(path, (Number(added) || 0) + (Number(deleted) || 0));
+  }
   const changed: string[] = [];
   const outside: string[] = [];
+  const cx = new Map<string, number>();
   const project = new Project({
     useInMemoryFileSystem: true,
     compilerOptions: { allowJs: true, jsx: ts.JsxEmit.Preserve, moduleResolution: ts.ModuleResolutionKind.Bundler },
@@ -36,7 +47,12 @@ export function analyze(cwd: string, branch: string): Analysis {
     const [kind, path] = [status[i], status[i + 1]];
     changed.push(path);
     if (kind === "D" || !CODE.test(path)) outside.push(path);
-    else project.createSourceFile(`/${path}`, git(cwd, ["show", `${branch}:${path}`]));
+    else {
+      const text = git(cwd, ["show", `${branch}:${path}`]);
+      project.createSourceFile(`/${path}`, text);
+      const before = kind === "A" ? 0 : complexity(path, git(cwd, ["show", `${mergeBase}:${path}`]));
+      cx.set(path, complexity(path, text) - before);
+    }
   }
   changed.sort();
   outside.sort();
@@ -56,7 +72,7 @@ export function analyze(cwd: string, branch: string): Analysis {
     }
     imports.set(from.slice(1), [...deps].sort());
   }
-  return { branch, mergeBase, changed, layers: layer(imports), outside, imports };
+  return { branch, mergeBase, changed, layers: layer(imports), outside, imports, lines, complexity: cx };
 }
 
 // Groups files into layers by longest import chain beneath them. Import cycles share a layer.
