@@ -16,7 +16,8 @@ One item per weekly run. Take the first open box from the top. Every item above
 when all of them read `- [x]`.
 
 Markers: `- [ ]` open · `- [-]` claimed by a run in progress · `- [x]` done ·
-`- [!]` blocked, reason on the line · `🔒 Needs Mike` only Mike can do it.
+`- [!]` blocked, reason on the line · `🔒 Needs Mike` only Mike can do it ·
+`small` docs or config a run can batch, up to four per PR (untagged = a feature, one per run).
 
 The slices come from [product/build-plan.md](product/build-plan.md). Slices 4 to 6
 (stacked PR chains, merge blocking, Python) sit below the release line because the build
@@ -33,12 +34,12 @@ plan's own cut list says a dry-run-only, TypeScript-only tool is complete withou
 
 ## 🚦 Public release
 
-- [ ] **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run build`, `npm test` and `npm run lint` on push to `main` and on every PR, and the latest run on `main` is green.
-- [ ] **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written.
-- [ ] **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box.
+- [ ] `small` **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run build`, `npm test` and `npm run lint` on push to `main` and on every PR, and the latest run on `main` is green.
+- [ ] `small` **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written.
+- [ ] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box.
 - [ ] **Live demo at `https://ai-automation-tools.dev/diff-carve/`.** Served by GitHub Pages from this repo through a `actions/deploy-pages` workflow. A visitor picks a bundled sample diff and sees it carved into scored layers with nothing to install. The org source bar sits across the very top, linking `https://github.com/ai-automation-tools/diff-carve`.
-- [ ] **Demo is safe to publish.** The sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret.
-- [ ] **README hero points at the demo.** The Live Demo badge and nav links resolve to the Pages URL above the fold.
+- [ ] `small` **Demo is safe to publish.** The sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret.
+- [ ] `small` **README hero points at the demo.** The Live Demo badge and nav links resolve to the Pages URL above the fold.
 
 ## After public release
 
