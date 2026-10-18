@@ -5,7 +5,7 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/verdict-awaiting_Mike-F59E0B?style=for-the-badge" alt="Verdict: awaiting Mike">
+  <img src="https://img.shields.io/badge/verdict-6_of_10_sensible-2ea44f?style=for-the-badge" alt="Verdict: 6 of 10 sensible">
   <a href="ROADMAP.md"><img src="https://img.shields.io/badge/plan-ROADMAP-8B5CF6?style=for-the-badge" alt="Roadmap"></a>
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs-6B7280?style=for-the-badge" alt="Docs home"></a>
 </p>
@@ -16,28 +16,32 @@ This is roadmap item *Slice 0b*. The spec's bar: at least 7 of 10 layer breakdow
 sensible, meaning files grouped by real dependency, not by line count. At 5 or fewer, the
 decision memo's falsifier fires and DiffCarve gets parked.
 
-The verdicts below are **proposals** written by the roadmap agent on 2026-09-30. The real
-verdict is Mike's: fill in the *Mike* column, then tick the sign-off item in the
-[roadmap](ROADMAP.md).
+The verdicts below were proposed by the roadmap agent on 2026-09-30. Mike signed off on
+them as they stand on 2026-10-12 ([OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)), so the *Mike*
+column repeats them. 6 of 10 is under the 7-of-10 bar but over the falsifier's 5: the spike
+gate is lifted and path-alias resolution goes on as ordinary roadmap work.
+
+Slice 1 re-ran the same ten PRs with the reviewability score; see
+[Slice 1: does the score agree with the verdicts?](#slice-1-does-the-score-agree-with-the-verdicts).
 
 ## Summary
 
-**Proposed: 6 of 10 sensible.** That's under the 7-of-10 bar and over the falsifier's 5.
+**Signed off: 6 of 10 sensible.** That's under the 7-of-10 bar and over the falsifier's 5.
 Three of the four misses have one cause, unresolved path aliases (see
 [What the misses have in common](#what-the-misses-have-in-common)).
 
 | # | PR | Lines | Files | Layers | Time | Proposed | Mike |
 |:--|:---|--:|--:|--:|--:|:--|:--|
-| 1 | [microsoft/vscode#338333](https://github.com/microsoft/vscode/pull/338333) | 740 | 17 | 4 | 2.29s | Sensible |  |
-| 2 | [microsoft/vscode#336254](https://github.com/microsoft/vscode/pull/336254) | 614 | 13 | 4 | 1.32s | Sensible |  |
-| 3 | [github/gh-aw-firewall#9303](https://github.com/github/gh-aw-firewall/pull/9303) | 732 | 27 | 7 | 1.64s | Sensible |  |
-| 4 | [github/gh-aw-firewall#9220](https://github.com/github/gh-aw-firewall/pull/9220) | 669 | 12 | 3 | 1.25s | Sensible |  |
-| 5 | [kentcdodds/mediarss#128](https://github.com/kentcdodds/mediarss/pull/128) | 534 | 7 | 2 | 1.02s | Arbitrary |  |
-| 6 | [Azure/Azurite#2740](https://github.com/Azure/Azurite/pull/2740) | 461 | 7 | 2 | 0.86s | Sensible |  |
-| 7 | [daraskme/Nextcloud-flare#25](https://github.com/daraskme/Nextcloud-flare/pull/25) | 2338 | 21 | 7 | 1.46s | Sensible |  |
-| 8 | [lalligood10/Battleship#28](https://github.com/lalligood10/Battleship/pull/28) | 1268 | 26 | 6 | 1.90s | Arbitrary |  |
-| 9 | [anishthite/devin-takehome#4](https://github.com/anishthite/devin-takehome/pull/4) | 2549 | 36 | 6 | 2.24s | Arbitrary |  |
-| 10 | [xpadev-net/video-host#60](https://github.com/xpadev-net/video-host/pull/60) | 1270 | 16 | 2 | 1.38s | Arbitrary |  |
+| 1 | [microsoft/vscode#338333](https://github.com/microsoft/vscode/pull/338333) | 740 | 17 | 4 | 2.29s | Sensible | Sensible |
+| 2 | [microsoft/vscode#336254](https://github.com/microsoft/vscode/pull/336254) | 614 | 13 | 4 | 1.32s | Sensible | Sensible |
+| 3 | [github/gh-aw-firewall#9303](https://github.com/github/gh-aw-firewall/pull/9303) | 732 | 27 | 7 | 1.64s | Sensible | Sensible |
+| 4 | [github/gh-aw-firewall#9220](https://github.com/github/gh-aw-firewall/pull/9220) | 669 | 12 | 3 | 1.25s | Sensible | Sensible |
+| 5 | [kentcdodds/mediarss#128](https://github.com/kentcdodds/mediarss/pull/128) | 534 | 7 | 2 | 1.02s | Arbitrary | Arbitrary |
+| 6 | [Azure/Azurite#2740](https://github.com/Azure/Azurite/pull/2740) | 461 | 7 | 2 | 0.86s | Sensible | Sensible |
+| 7 | [daraskme/Nextcloud-flare#25](https://github.com/daraskme/Nextcloud-flare/pull/25) | 2338 | 21 | 7 | 1.46s | Sensible | Sensible |
+| 8 | [lalligood10/Battleship#28](https://github.com/lalligood10/Battleship/pull/28) | 1268 | 26 | 6 | 1.90s | Arbitrary | Arbitrary |
+| 9 | [anishthite/devin-takehome#4](https://github.com/anishthite/devin-takehome/pull/4) | 2549 | 36 | 6 | 2.24s | Arbitrary | Arbitrary |
+| 10 | [xpadev-net/video-host#60](https://github.com/xpadev-net/video-host/pull/60) | 1270 | 16 | 2 | 1.38s | Arbitrary | Arbitrary |
 
 Every PR was opened by an AI coding agent (GitHub Copilot's coding agent for the
 Microsoft, GitHub and Azure repos, Devin for the rest), merged, public, and over 400
@@ -76,8 +80,48 @@ Nothing from those repos is vendored here. The file lists below are paths only.
   but they read oddly next to the foundation code.
 
 If the alias resolver is fixed and the spike re-run, #5, #9 and #10 are likely to flip,
-which would put the count at 8 or 9. Whether to do that before sign-off is an open
-question in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md).
+which would put the count at 8 or 9. Mike chose to sign off without that re-run; the
+resolver fix is left to ordinary roadmap work.
+
+## Slice 1: does the score agree with the verdicts?
+
+Re-run on 2026-10-14 with the Slice 1 CLI (`node src/cli.ts analyze pr`, same scratch-repo
+method), which scores each layer out of 100 and passes it at 50 or more. Every PR gave the
+same layers as above. A PR's score passes when every one of its layers passes.
+
+| # | Layer scores, in order (❌ under 50) | Score says | Verdict | Agree? |
+|:--|:--|:--|:--|:--|
+| 1 | 73 · 34❌ · 54 · 94 | Fail | Sensible | No |
+| 2 | 77 · 61 · 83 · 52 | Pass | Sensible | Yes |
+| 3 | 70 · 59 · 76 · 81 · 95 · 95 · 94 | Pass | Sensible | Yes |
+| 4 | 66 · 41❌ · 77 | Fail | Sensible | No |
+| 5 | 82 · 83 | Pass | Arbitrary | No |
+| 6 | 92 · 54 | Pass | Sensible | Yes |
+| 7 | 94 · 88 · 75 · 22❌ · 23❌ · 73 · 57 | Fail | Sensible | No |
+| 8 | 65 · 63 · 26❌ · 26❌ · 76 · 97 | Fail | Arbitrary | Yes |
+| 9 | 7❌ · 14❌ · 44❌ · 62 · 26❌ · 55 | Fail | Arbitrary | Yes |
+| 10 | 22❌ · 96 | Fail | Arbitrary | Yes |
+
+**6 of 10 agree.** Three of the four arbitrary splits fail, and three of the six sensible
+ones pass. Analysis took 1.6 to 5.4 seconds per PR, slower than Slice 0 because the
+complexity delta reads every changed file at the merge base too, and still far inside 60.
+
+The disagreements are two different things:
+
+- **Sensible order, oversized layer (#1, #4, #7).** The verdict judged the cut; the score
+  judges whether each piece is small enough to review. #7's layer 5 is 1,333 lines with
+  +128 complexity, and #1's layer 2 adds 54 branch points in 286 lines. Those layers really
+  are too big for one review, so the score is doing its job here. They're the case for
+  splitting a layer further, which import order alone can't do.
+- **Arbitrary order, small layers (#5).** The helper shares a layer with the routes that
+  import it because the `#app/...` alias isn't resolved. The score sees two small layers and
+  passes them. It measures size, not whether an edge is missing, so it can't catch an
+  analyzer miss. Path-alias resolution is the fix for #5, #9 and #10, not the score.
+
+One thing to watch: lines dominate less than they might. #6's layer 2 is 454 lines of tests
+and still passes at 54, because it touches three files with no reverse dependencies. The
+weights and budgets move into `diffcarve.yml` in Slice 2, so a repo that wants lines to
+weigh more can say so.
 
 ## Layer breakdowns
 
