@@ -19,6 +19,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - Reviewability score: each layer scores 0 to 100 (pass at 50) and shows its inputs, lines changed, files touched, cyclomatic complexity delta (branch points after minus before) and reverse-dependency count. `diffcarve analyze <branch> --dry-run` prints the proposed stack as PR-comment markdown. Re-run on the ten spike PRs, the score's pass/fail agrees with the verdicts on 6 of 10, recorded in `SPIKE_RESULTS.md`. *Build: Slice 1*
 
 **Docs**
+- 2026-10-19: the roadmap moved onto the lab's roadmap standard: `now` and `stage` badges, an intro naming the Diff-Carve Weekly Roadmap routine, the Build section split into one heading per build-plan slice (Slices 0 and 1 marked done), done notes moved to the end of each item (`— done YYYY-MM-DD: …`), and Monetize renamed Revenue. No items added or dropped, and every state is unchanged.
 - `OPEN-QUESTIONS.md`: where path-alias resolution goes on the roadmap.
 - Spike signed off: Mike accepted the results as they stand, 6 of 10 sensible (2026-10-12). `SPIKE_RESULTS.md` records the verdicts and the spike gate is lifted. *Build: spike sign-off*
 - `docs/SPIKE_RESULTS.md`: `diffcarve analyze` run on ten public, merged, AI-written PRs over 400 lines, with every layer breakdown, analysis times (all under 2.3s), and a proposed verdict per PR: 6 of 10 sensible, three of the misses from unresolved path aliases. Awaiting Mike's sign-off. *Build: Slice 0b*
