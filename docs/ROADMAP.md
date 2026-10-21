@@ -5,27 +5,30 @@
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/now-slice_2:_config-F59E0B?style=for-the-badge" alt="Now: Slice 2, config">
+  <img src="https://img.shields.io/badge/now-slice_3:_github_action-F59E0B?style=for-the-badge" alt="Now: Slice 3, GitHub Action">
   <img src="https://img.shields.io/badge/stage-incubating-2ea44f?style=for-the-badge" alt="Stage: incubating">
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs_home-6B7280?style=for-the-badge" alt="Back to docs"></a>
 </p>
 
 ---
 
-The Diff-Carve Weekly Roadmap routine works this file top to bottom every Wednesday: it
-takes the first open item that isn't `🔒 Needs Mike` (or up to four `small` ones), builds
+The Diff-Carve Weekly Roadmap routine works this file top to bottom every Monday, Wednesday and Friday: it
+takes the first open item that isn't `🔒 Needs Mike` (or up to six `small` ones), builds
 it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `## After public
 release` is a release gate.** DiffCarve goes public when all of them are ticked and Mike
 says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and updates any doc
 it made stale, in the same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
-(the reason follows on the line). `small` marks docs or config a run can batch, up to four
+(the reason follows on the line). `small` marks docs or config a run can batch, up to six
 per PR (untagged means a feature, one per run); `🔒 Needs Mike` marks one only Mike can do.
 
 The slices come from [product/build-plan.md](product/build-plan.md). Slices 4 to 6
 (stacked PR chains, merge blocking, Python) sit below the release line because the build
 plan's own cut list says a dry-run-only, TypeScript-only tool is complete without them.
+Since 2026-10-19 DiffCarve goes public at its MVP: the CLI (Slices 0 and 1) and the
+dry-run Action (Slice 3). Slice 2, config, moved below the line too: the documented
+defaults work without it, and the routine builds it after release.
 
 ## 🔬 Slice 0: Walking skeleton, the spike (done 2026-10-12)
 
@@ -37,10 +40,6 @@ plan's own cut list says a dry-run-only, TypeScript-only tool is complete withou
 
 - [x] **Slice 1: reviewability score and `--dry-run` output.** Each layer gets a numeric score plus the inputs behind it (lines changed, files touched, cyclomatic complexity delta, reverse-dependency count). `--dry-run` prints the proposed stack as the markdown a PR comment would carry. Re-run on the ten spike PRs and record in `SPIKE_RESULTS.md` whether the score's pass/fail line agrees with the verdicts. — done 2026-10-14: `src/score.ts`; score agrees with the spike verdicts on 6 of 10, see [SPIKE_RESULTS.md](SPIKE_RESULTS.md#slice-1-does-the-score-agree-with-the-verdicts)
 
-## ⚙️ Slice 2: Config, `diffcarve.yml`
-
-- [ ] **Slice 2: `diffcarve.yml`.** Line budget, trigger threshold, complexity threshold, and per-language file-boundary rules read from `diffcarve.yml`, with the defaults documented. A test proves changing the config changes the output.
-
 ## 🤖 Slice 3: GitHub Action wrapper, dry-run only
 
 - [ ] **Slice 3: the GitHub Action, dry-run only.** An `action.yml` at the repo root runs on `pull_request` opened/synchronize. Under the threshold it does nothing: no comment, no check. Over it, it posts or updates one dry-run comment. Needs only `GITHUB_TOKEN`, makes no calls outside GitHub, and finishes in under 60 seconds. Proven on this repo's own PRs through a workflow that uses `./`, not a published tag.
@@ -50,9 +49,7 @@ plan's own cut list says a dry-run-only, TypeScript-only tool is complete withou
 - [ ] `small` **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run build`, `npm test` and `npm run lint` on push to `main` and on every PR, and the latest run on `main` is green.
 - [ ] `small` **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written.
 - [ ] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box.
-- [ ] **Live demo at `https://ai-automation-tools.dev/diff-carve/`.** Served by GitHub Pages from this repo through a `actions/deploy-pages` workflow. A visitor picks a bundled sample diff and sees it carved into scored layers with nothing to install. The org source bar sits across the very top, linking `https://github.com/ai-automation-tools/diff-carve`.
-- [ ] `small` **Demo is safe to publish.** The sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret.
-- [ ] `small` **README hero points at the demo.** The Live Demo badge and nav links resolve to the Pages URL above the fold.
+- [ ] **Live demo at `https://ai-automation-tools.dev/diff-carve/`.** Served by GitHub Pages from this repo through a `actions/deploy-pages` workflow. A visitor picks a bundled sample diff and sees it carved into scored layers with nothing to install. The org source bar sits across the very top, linking `https://github.com/ai-automation-tools/diff-carve`. Safe to publish: the sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret. The README hero's Live Demo badge and nav links resolve to the Pages URL above the fold.
 
 ## After public release
 
@@ -60,6 +57,7 @@ Nothing below blocks go-live.
 
 ### 🧩 Fast-follow slices
 
+- [ ] **Slice 2: `diffcarve.yml`.** Line budget, trigger threshold, complexity threshold, and per-language file-boundary rules read from `diffcarve.yml`, with the defaults documented. A test proves changing the config changes the output.
 - [ ] **Slice 4: stacked PR chain creation.** With `--dry-run` off, the Action opens the layers as a real GitHub Stacked PR chain. Check first whether the Stacked PR API can be called from an Action at all; if it can't, record what's missing in `docs/` and stop there.
 - [ ] **Slice 5: merge-blocking check with override.** A failing layer gets a failing check. A named second reviewer can override it, and the override leaves an audit entry.
 - [ ] **Slice 6: Python support.** A Python analyzer (the `ast` module) passes a smaller spike at a rate comparable to Slice 0's TypeScript results.
