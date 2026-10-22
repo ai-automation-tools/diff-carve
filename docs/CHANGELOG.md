@@ -19,6 +19,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - `diffcarve analyze` resolves path aliases: tsconfig and jsconfig `paths` (from the config nearest each file, following relative `extends`) and package.json `imports`, all read from the branch. Re-run on the ten spike PRs, #5 and #9 now carve sensibly and #10 fails for the same reason as #8 (unconnected backend and frontend share layers): 8 of 10 proposed, recorded in `SPIKE_RESULTS.md`. *Build: Path aliases*
 - Reviewability score: each layer scores 0 to 100 (pass at 50) and shows its inputs, lines changed, files touched, cyclomatic complexity delta (branch points after minus before) and reverse-dependency count. `diffcarve analyze <branch> --dry-run` prints the proposed stack as PR-comment markdown. Re-run on the ten spike PRs, the score's pass/fail agrees with the verdicts on 6 of 10, recorded in `SPIKE_RESULTS.md`. *Build: Slice 1*
 
+**Changed**
+- Moved to the org folder layout: the agent instructions are in `AGENTS.md` now (Codex, Gemini CLI and opencode read it), and `CLAUDE.md` is a bare `@AGENTS.md` import for Claude Code. The test folder is `tests/` instead of `test/`, with every path that named it updated.
+
 **Docs**
 - `OPEN-QUESTIONS.md`: Mike's answer on path aliases applied; the roadmap gains a Path aliases item after Slice 1.
 - 2026-10-19: release scope cut to the MVP (pipeline change, Mike). Slice 2, config, moved below `## After public release`; the demo-safety and README-hero items folded into the live-demo item; the routine now runs Mon/Wed/Fri and batches up to six `small` items. No item dropped.
