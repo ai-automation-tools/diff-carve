@@ -2,7 +2,7 @@
 
 > Copied from the DiffCarve business plan (`Business-Plans/diff-carve/build/build-plan.md` in the private pipeline workspace) on 2026-09-22. The slices here became the build gates in [`docs/ROADMAP.md`](../ROADMAP.md).
 
-**Spec:** [spec.md](spec.md) · **Architecture:** ADR-001 (static import-graph analysis, not an LLM) and ADR-002 (no licensing backend), summarized in [CLAUDE.md](../../CLAUDE.md)
+**Spec:** [spec.md](spec.md) · **Architecture:** ADR-001 (static import-graph analysis, not an LLM) and ADR-002 (no licensing backend), summarized in [AGENTS.md](../../AGENTS.md)
 
 Sequenced for this org's one-roadmap-item-per-week cadence. Each slice below is sized to roughly one week, per `models/estimate.py`, and ships something a person can look at — no slice is "half the analyzer, invisible until next week."
 

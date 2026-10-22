@@ -88,8 +88,8 @@ npm test && npm run lint
 |:---|:---|
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
-| [**🧪 test/**](test/) | Tests for `node --test`, run straight from TypeScript. |
-| [**🤖 CLAUDE.md**](CLAUDE.md) | Standing orders for the agent that works the roadmap each week. |
+| [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
 ---
 

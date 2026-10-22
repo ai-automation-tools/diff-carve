@@ -18,7 +18,7 @@
 | [**analyze.ts**](analyze.ts) | `analyze(cwd, branch)` lists the branch's changes since its merge base, builds an in-memory ts-morph import graph over the changed TS/JS files (resolving relative imports, tsconfig/jsconfig `paths` and package.json `imports`, read from the branch), and `layer()` orders them into layers (import cycles share one). Also records lines changed and the complexity delta per file. |
 | [**score.ts**](score.ts) | `scoreLayers()` gives each layer a 0 to 100 reviewability score from its lines, files, complexity delta and reverse dependencies, against the budgets in `BUDGETS`. `complexity()` counts branch points. |
 
-Tests live in [`../test/`](../test/) and import these files directly; Node strips
+Tests live in [`../tests/`](../tests/) and import these files directly; Node strips
 the types at runtime, so there's no build step before `npm test`.
 
 ---
