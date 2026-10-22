@@ -55,6 +55,16 @@ const repo = fixtureRepo({
     "b.ts": 'import { a } from "./a";\nexport const b = () => a;\n',
     "c.js": 'const { a } = require("./a");\nmodule.exports = a;\n',
   },
+  // tsconfig `paths` through an `extends` (with a comment, as tsconfigs have), and package.json `imports`.
+  aliases: {
+    "web/tsconfig.base.json": '{\n  // paths are relative to this file\n  "compilerOptions": { "paths": { "@/*": ["./src/*"] } },\n}\n',
+    "web/tsconfig.json": '{ "extends": "./tsconfig.base.json" }\n',
+    "web/src/lib/db.ts": "export const db = 1;\n",
+    "web/src/pages/home.tsx": 'import { db } from "@/lib/db";\nexport const Home = () => <p>{db}</p>;\n',
+    "srv/package.json": '{ "imports": { "#app/*": "./app/*" } }\n',
+    "srv/app/helper.ts": "export const h = 1;\n",
+    "srv/app/route.ts": 'import { h } from "#app/helper.ts";\nimport { db } from "@/lib/db";\nexport const r = h + db;\n',
+  },
   // Grows src/grow.ts from 1 branch point to 5, and adds a caller with 1.
   grow: {
     "src/grow.ts": "export const f = (x: number) => {\n  if (x > 1 && x < 9) return 1;\n  for (const y of [x]) if (y) return y ?? 2;\n  return 0;\n};\n",
@@ -85,6 +95,14 @@ test("no layer imports from a later one", () => {
 
 test("an import cycle shares one layer", () => {
   assert.deepEqual(analyze(repo, "cycle").layers, [["a.ts", "b.ts"], ["c.js"]]);
+});
+
+test("tsconfig paths and package.json imports resolve, each only under its own config", () => {
+  const a = analyze(repo, "aliases");
+  assert.deepEqual(a.layers, [["srv/app/helper.ts", "web/src/lib/db.ts"], ["srv/app/route.ts", "web/src/pages/home.tsx"]]);
+  // srv/ has no tsconfig, so web/'s `@/` alias doesn't reach it.
+  assert.deepEqual(a.imports.get("srv/app/route.ts"), ["srv/app/helper.ts"]);
+  assert.deepEqual(a.imports.get("web/src/pages/home.tsx"), ["web/src/lib/db.ts"]);
 });
 
 test("the same diff always gives the same layers", () => {

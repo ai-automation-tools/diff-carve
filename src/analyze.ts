@@ -1,4 +1,5 @@
 import { execFileSync } from "node:child_process";
+import { posix } from "node:path";
 import { Project, ts } from "ts-morph";
 import { complexity } from "./score.ts";
 
@@ -19,6 +20,7 @@ export type Analysis = {
   complexity: Map<string, number>;
 };
 
+const { dirname } = posix;
 const CODE = /\.(ts|tsx|mts|cts|js|jsx|mjs|cjs)$/;
 
 function git(cwd: string, args: string[]): string {
@@ -57,22 +59,61 @@ export function analyze(cwd: string, branch: string): Analysis {
   changed.sort();
   outside.sort();
 
-  // ponytail: resolves relative imports only. tsconfig `paths` aliases (`@/lib/x`) and
-  // workspace packages don't resolve yet; the spike (Slice 0b) will say whether that matters.
-  const host = project.getModuleResolutionHost();
   const options = project.getCompilerOptions();
+  const optionsFor = aliases(cwd, branch, project, options);
+  const host = project.getModuleResolutionHost();
   const imports = new Map<string, string[]>();
   for (const sf of project.getSourceFiles()) {
     const from = sf.getFilePath();
+    const opts = optionsFor(from);
     const deps = new Set<string>();
     // `imports` covers import/export-from, dynamic import(), and require() in JS.
     for (const lit of sf.getImportStringLiterals()) {
-      const to = ts.resolveModuleName(lit.getLiteralText(), from, options, host).resolvedModule?.resolvedFileName;
+      const to = ts.resolveModuleName(lit.getLiteralText(), from, opts, host).resolvedModule?.resolvedFileName;
       if (to && to !== from && project.getSourceFile(to)) deps.add(to.slice(1));
     }
     imports.set(from.slice(1), [...deps].sort());
   }
   return { branch, mergeBase, changed, layers: layer(imports), outside, imports, lines, complexity: cx };
+}
+
+const CONFIG = /(^|\/)(tsconfig|jsconfig|package)\.json$/;
+
+// Copies the tsconfig, jsconfig and package.json files above each changed file into the
+// in-memory project, so package.json `imports` (`#app/x`) resolve, and returns the
+// compiler options for a file: its nearest tsconfig's or jsconfig's `paths` (`@/lib/x`)
+// on top of `base`. Configs come from the branch, not the working tree.
+function aliases(cwd: string, branch: string, project: Project, base: ts.CompilerOptions) {
+  const fs = project.getFileSystem();
+  const dirs = new Set<string>();
+  for (const sf of project.getSourceFiles()) for (let d: string = sf.getDirectoryPath(); !dirs.has(d); d = dirname(d)) dirs.add(d);
+  const configs = git(cwd, ["ls-tree", "-r", "-z", "--name-only", branch]).split("\0").filter((p) => CONFIG.test(p));
+  for (const p of configs) if (dirs.has(dirname(`/${p}`))) fs.writeFileSync(`/${p}`, git(cwd, ["show", `${branch}:${p}`]));
+  const readFile = (p: string): string | undefined => {
+    if (fs.fileExistsSync(p)) return fs.readFileSync(p);
+    try {
+      return git(cwd, ["show", `${branch}:${p.slice(1)}`]); // an `extends` outside the ancestor dirs
+    } catch {
+      return undefined; // `extends` from node_modules: not on the branch, so its `paths` are skipped
+    }
+  };
+  const parseHost = { useCaseSensitiveFileNames: true, readDirectory: () => [], fileExists: (p: string) => readFile(p) !== undefined, readFile };
+  const parsed = new Map<string, ts.CompilerOptions>();
+  return (file: string): ts.CompilerOptions => {
+    for (let d = dirname(file); ; d = dirname(d)) {
+      const config = ["tsconfig.json", "jsconfig.json"].map((n) => `${d === "/" ? "" : d}/${n}`).find((p) => fs.fileExistsSync(p));
+      if (config) {
+        if (!parsed.has(config)) {
+          const { config: json } = ts.readConfigFile(config, readFile);
+          // Errors (an unknown `extends`, deprecated options) are ignored: `paths` is all we need.
+          const { paths, baseUrl, pathsBasePath } = ts.parseJsonConfigFileContent(json ?? {}, parseHost, dirname(config)).options;
+          parsed.set(config, { ...base, paths, baseUrl, pathsBasePath });
+        }
+        return parsed.get(config)!;
+      }
+      if (d === "/") return base;
+    }
+  };
 }
 
 // Groups files into layers by longest import chain beneath them. Import cycles share a layer.
