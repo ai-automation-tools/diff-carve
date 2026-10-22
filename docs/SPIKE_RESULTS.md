@@ -23,6 +23,8 @@ gate is lifted and path-alias resolution goes on as ordinary roadmap work.
 
 Slice 1 re-ran the same ten PRs with the reviewability score; see
 [Slice 1: does the score agree with the verdicts?](#slice-1-does-the-score-agree-with-the-verdicts).
+On 2026-10-21 they ran again with tsconfig `paths` and package.json `imports` resolved; see
+[Path aliases: the re-run](#path-aliases-the-re-run). Proposed count after it: 8 of 10.
 
 ## Summary
 
@@ -81,7 +83,8 @@ Nothing from those repos is vendored here. The file lists below are paths only.
 
 If the alias resolver is fixed and the spike re-run, #5, #9 and #10 are likely to flip,
 which would put the count at 8 or 9. Mike chose to sign off without that re-run; the
-resolver fix is left to ordinary roadmap work.
+resolver fix is left to ordinary roadmap work. It landed on 2026-10-21: #5 and #9 flipped,
+#10 now fails the way #8 does ([the re-run](#path-aliases-the-re-run)).
 
 ## Slice 1: does the score agree with the verdicts?
 
@@ -122,6 +125,67 @@ One thing to watch: lines dominate less than they might. #6's layer 2 is 454 lin
 and still passes at 54, because it touches three files with no reverse dependencies. The
 weights and budgets move into `diffcarve.yml` in Slice 2, so a repo that wants lines to
 weigh more can say so.
+
+## Path aliases: the re-run
+
+Re-run on 2026-10-21 after the analyzer learned tsconfig and jsconfig `paths` (from the
+config nearest each file, following `extends`) and package.json `imports`. Same method,
+except the scratch repos now also carry, at the PR head, every `tsconfig.json`,
+`jsconfig.json` and `package.json` above a changed file plus the configs they `extend`, so
+the analyzer sees the aliases the real repo has. Analysis took 1.4 to 5.5 seconds per PR.
+
+Seven PRs give exactly the layers above. #5, #9 and #10 change:
+
+| # | Layers before → after | Score after (❌ under 50) | Proposed verdict | Score agrees? |
+|:--|:--|:--|:--|:--|
+| 5 | 2 → 2 | 82 · 80 | Arbitrary → **Sensible** | Yes (was No) |
+| 9 | 6 → 9 | 48❌ · 29❌ · 41❌ · 59 · 19❌ · 42❌ · 87 · 58 · 63 | Arbitrary → **Sensible** | No (was Yes) |
+| 10 | 2 → 4 | 47❌ · 25❌ · 90 · 96 | Arbitrary → Arbitrary, new reason | Yes |
+
+**Proposed: 8 of 10 sensible**, over the 7-of-10 bar. These verdicts are the roadmap
+agent's; the signed-off count above stays 6 until Mike says otherwise. The score still
+agrees on 6 of 10: #5 now agrees and #9 joins #1, #4 and #7 as a sensible stack with
+oversized layers.
+
+- **#5, Sensible.** The new `description-html` helper sits in layer 1; the two routes and
+  its test, which reach it through `#app/helpers/...`, follow in layer 2. The client
+  component that imports none of them stays in layer 1.
+- **#9, Sensible.** The `@/` imports now resolve and the stack reads bottom-up: types,
+  actor and audit-log primitives; the Dataverse client and kit services; their Dataverse
+  implementations; config; auth and the HTTP client; the service wiring and its tests;
+  `authz`; then the `(app)` pages and, last, the approvals page that imports their actions.
+  Nine layers is a lot, and five fail the score, which is fair for 2,549 lines.
+- **#10, Arbitrary, for #8's reason now.** Both halves are ordered correctly (backend
+  models, S3 and auth helpers before the routes that use them; the frontend upload hook
+  before the pages), but `app/backend/` and `app/frontend/` share no imports and get
+  interleaved layer by layer. Splitting unconnected components into separate stacks would
+  fix both #8 and #10.
+
+### Re-run layer breakdowns
+
+**5. [kentcdodds/mediarss#128](https://github.com/kentcdodds/mediarss/pull/128)**, 1.64s
+
+- **Layer 1:** `app/client/admin/media-detail.tsx`, `app/helpers/description-html.ts`
+- **Layer 2:** `app/helpers/description-html.test.ts`, `app/routes/admin/api/media.$path.metadata.ts`, `app/routes/admin/api/media.$path.ts`
+
+**9. [anishthite/devin-takehome#4](https://github.com/anishthite/devin-takehome/pull/4)**, 3.61s
+
+- **Layer 1:** `next.config.ts`, `src/app/forbidden.tsx`, `src/demo/personas.ts`, `src/lib/dataverse/types.ts`, `src/lib/kit/actor.ts`, `src/lib/kit/audit-log.ts`, `src/lib/kit/role-provider.ts`
+- **Layer 2:** `src/demo/audit-log.ts`, `src/lib/dataverse/client.ts`, `src/lib/kit/approvals.ts`, `src/lib/kit/audit-reader.ts`
+- **Layer 3:** `src/demo/approvals.ts`, `src/lib/dataverse/approval-mirror.ts`, `src/lib/dataverse/audit-reader.ts`, `src/lib/dataverse/flow-approvals.ts`, `src/lib/dataverse/role-provider.ts`
+- **Layer 4:** `src/demo/dataverse/org.ts`, `src/lib/dataverse/config.ts`
+- **Layer 5:** `src/auth.ts`, `src/demo/dataverse/client.ts`, `src/lib/dataverse/http-client.ts`, `tests/dataverse-config.test.ts`
+- **Layer 6:** `src/lib/kit/services.ts`, `tests/approvals.test.ts`, `tests/audit.test.ts`, `tests/dataverse-client.test.ts`, `tests/role-provider.test.ts`
+- **Layer 7:** `src/lib/kit/authz.ts`
+- **Layer 8:** `src/app/(app)/approvals/actions.ts`, `src/app/(app)/audit/page.tsx`, `src/app/(app)/layout.tsx`, `src/app/(app)/page.tsx`
+- **Layer 9:** `src/app/(app)/approvals/page.tsx`
+
+**10. [xpadev-net/video-host#60](https://github.com/xpadev-net/video-host/pull/60)**, 3.73s
+
+- **Layer 1:** `app/backend/src/@types/models.ts`, `app/backend/src/lib/s3.ts`, `app/backend/src/utils/movieAuth.ts`, `app/frontend/src/hooks/useUpload.ts`, `app/frontend/src/pages/dashboard/videos/index.tsx`
+- **Layer 2:** `app/backend/src/routes/api/v4/upload.ts`, `app/backend/src/utils/buildVisibilityFilter.ts`, `app/frontend/src/pages/dashboard/videos/[id]/edit.tsx`, `app/frontend/src/pages/dashboard/videos/new.tsx`
+- **Layer 3:** `app/backend/src/__tests__/authorization.test.ts`, `app/backend/src/routes/api/v4/movies/[movie].ts`, `app/backend/src/routes/api/v4/series/[series].ts`
+- **Layer 4:** `app/backend/src/routes/api/v4/movies/index.ts`
 
 ## Layer breakdowns
 
