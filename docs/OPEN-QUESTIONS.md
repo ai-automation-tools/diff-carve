@@ -5,12 +5,13 @@ Decisions only Mike can make. The roadmap agent asks here; an entry with a fille
 
 ## Open
 
+## Answered
+
 ### Where does path-alias resolution go on the roadmap, now that Slice 1's score is in?
 - Asked: 2026-10-14 by diff-carve-roadmap
 - Context: Your 2026-10-12 answer said alias resolution can be picked up as normal roadmap work, but the roadmap has no item for it. Slice 1's score agrees with the spike verdicts on 6 of 10 ([SPIKE_RESULTS.md](SPIKE_RESULTS.md#slice-1-does-the-score-agree-with-the-verdicts)): three disagreements are sensible stacks with one oversized layer (the score doing its job), and one is #5, where an unresolved `#app/...` alias leaves a bad order the score can't see. Options: (a) add "Resolve tsconfig `paths` and package.json `imports`, re-run the spike" as a Build item right after Slice 1, so the next run does it before Slice 2; (b) add it after Slice 3, still a release gate; (c) put it under Fast-follow slices, after public release. Recommendation: (a). It's a few dozen lines with ts-morph and no new dependency, it flips three of the four misses, and every later slice (config, Action, demo) shows its output on real repos, most of which import through aliases. Until you answer, the next run takes Slice 2 as the roadmap stands.
 - Answer: (a) Add "Resolve tsconfig `paths` and package.json `imports`, re-run the spike" as a Build item right after Slice 1. (Mike, 2026-10-19)
-
-## Answered
+- Applied: 2026-10-21 by diff-carve-roadmap
 
 ### Fix path-alias resolution and re-run the spike before signing it off?
 - Asked: 2026-09-30 by diff-carve-roadmap

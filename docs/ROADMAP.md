@@ -39,6 +39,7 @@ defaults work without it, and the routine builds it after release.
 ## 📊 Slice 1: CLI core, scoring and `--dry-run` output (done 2026-10-14)
 
 - [x] **Slice 1: reviewability score and `--dry-run` output.** Each layer gets a numeric score plus the inputs behind it (lines changed, files touched, cyclomatic complexity delta, reverse-dependency count). `--dry-run` prints the proposed stack as the markdown a PR comment would carry. Re-run on the ten spike PRs and record in `SPIKE_RESULTS.md` whether the score's pass/fail line agrees with the verdicts. — done 2026-10-14: `src/score.ts`; score agrees with the spike verdicts on 6 of 10, see [SPIKE_RESULTS.md](SPIKE_RESULTS.md#slice-1-does-the-score-agree-with-the-verdicts)
+- [x] **Path aliases: resolve tsconfig `paths` and package.json `imports`, re-run the spike.** Imports through a tsconfig or jsconfig `paths` alias (`@/lib/x`) or a package.json `imports` entry (`#app/x`) resolve to the changed file they point at, using the config nearest each file on the branch. Re-run the ten spike PRs and record in `SPIKE_RESULTS.md` which verdicts the new layers change. Added 2026-10-21 from Mike's answer in [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md). — done 2026-10-21: `aliases()` in `src/analyze.ts`; the re-run flips #5 and #9 to sensible, 8 of 10 proposed, see [SPIKE_RESULTS.md](SPIKE_RESULTS.md#path-aliases-the-re-run)
 
 ## 🤖 Slice 3: GitHub Action wrapper, dry-run only
 

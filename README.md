@@ -55,7 +55,7 @@ DiffCarve server, and your source code never leaves the runner.
 
 | Feature | Status |
 |:---|:---|
-| **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports; `paths` aliases not yet) |
+| **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports, tsconfig `paths` and package.json `imports` aliases) |
 | **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50, with the lines, files, complexity delta and reverse dependencies behind it |
 | **`--dry-run`** | ✅ Built. Prints the proposed stack as PR-comment markdown; posting it is the Action's job (Slice 3) |
 | **`diffcarve.yml`** | Slice 2. Line budget, trigger threshold, per-language boundary rules |
@@ -88,8 +88,8 @@ npm test && npm run lint
 |:---|:---|
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI source. |
-| [**🧪 test/**](test/) | Tests for `node --test`, run straight from TypeScript. |
-| [**🤖 CLAUDE.md**](CLAUDE.md) | Standing orders for the agent that works the roadmap each week. |
+| [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
 ---
 
