@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- GitHub Action, dry run only: `action.yml` runs on `pull_request` opened/synchronize, carves the PR head against its base, and under the threshold (400 changed lines, the `threshold` input) does nothing. Over it, it posts one comment with the proposed stack, or updates the one it posted before. Needs only `GITHUB_TOKEN` and calls nothing but the GitHub API; a fork's read-only token logs a warning instead of failing. `.github/workflows/diffcarve.yml` runs it on this repo's own PRs from `./`. `analyze()` takes an optional base ref (HEAD by default). *Build: Slice 3*
 - `diffcarve analyze` resolves path aliases: tsconfig and jsconfig `paths` (from the config nearest each file, following relative `extends`) and package.json `imports`, all read from the branch. Re-run on the ten spike PRs, #5 and #9 now carve sensibly and #10 fails for the same reason as #8 (unconnected backend and frontend share layers): 8 of 10 proposed, recorded in `SPIKE_RESULTS.md`. *Build: Path aliases*
 - Reviewability score: each layer scores 0 to 100 (pass at 50) and shows its inputs, lines changed, files touched, cyclomatic complexity delta (branch points after minus before) and reverse-dependency count. `diffcarve analyze <branch> --dry-run` prints the proposed stack as PR-comment markdown. Re-run on the ten spike PRs, the score's pass/fail agrees with the verdicts on 6 of 10, recorded in `SPIKE_RESULTS.md`. *Build: Slice 1*
 

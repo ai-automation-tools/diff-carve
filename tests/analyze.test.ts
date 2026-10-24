@@ -1,40 +1,10 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
-import { execFileSync } from "node:child_process";
-import { mkdirSync, mkdtempSync, rmSync, writeFileSync } from "node:fs";
-import { tmpdir } from "node:os";
-import { dirname, join } from "node:path";
+import { rmSync } from "node:fs";
 import { analyze, layer } from "../src/analyze.ts";
 import { run } from "../src/run.ts";
 import { BUDGETS, PASS, complexity, scoreLayers } from "../src/score.ts";
-
-type Files = Record<string, string>;
-
-function write(dir: string, files: Files) {
-  for (const [path, body] of Object.entries(files)) {
-    mkdirSync(dirname(join(dir, path)), { recursive: true });
-    writeFileSync(join(dir, path), body);
-  }
-}
-
-// A throwaway repo: `main` has a README plus `base`, each branch commits the given files on top of it.
-function fixtureRepo(branches: Record<string, Files>, base: Files = {}): string {
-  const dir = mkdtempSync(join(tmpdir(), "diffcarve-"));
-  const git = (...args: string[]) =>
-    execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", ...args], { cwd: dir, stdio: "pipe" });
-  git("init", "-q", "-b", "main");
-  write(dir, { "README.md": "fixture\n", ...base });
-  git("add", "-A");
-  git("commit", "-q", "-m", "base");
-  for (const [name, files] of Object.entries(branches)) {
-    git("checkout", "-q", "-b", name, "main");
-    write(dir, files);
-    git("add", "-A");
-    git("commit", "-q", "--allow-empty", "-m", name);
-  }
-  git("checkout", "-q", "main");
-  return dir;
-}
+import { fixtureRepo } from "./fixture.ts";
 
 const layered = {
   // Named so alphabetical order is not dependency order.
