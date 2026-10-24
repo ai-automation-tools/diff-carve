@@ -43,7 +43,7 @@ defaults work without it, and the routine builds it after release.
 
 ## 🤖 Slice 3: GitHub Action wrapper, dry-run only (done 2026-10-23)
 
-- [x] **Slice 3: the GitHub Action, dry-run only.** An `action.yml` at the repo root runs on `pull_request` opened/synchronize. Under the threshold it does nothing: no comment, no check. Over it, it posts or updates one dry-run comment. Needs only `GITHUB_TOKEN`, makes no calls outside GitHub, and finishes in under 60 seconds. Proven on this repo's own PRs through a workflow that uses `./`, not a published tag. — done 2026-10-23: `action.yml` and `src/action.ts`, threshold 400 changed lines (an input until Slice 2); proven by `.github/workflows/diffcarve.yml` on PR #11
+- [x] **Slice 3: the GitHub Action, dry-run only.** An `action.yml` at the repo root runs on `pull_request` opened/synchronize. Under the threshold it does nothing: no comment, no check. Over it, it posts or updates one dry-run comment. Needs only `GITHUB_TOKEN`, makes no calls outside GitHub, and finishes in under 60 seconds. Proven on this repo's own PRs through a workflow that uses `./`, not a published tag. — done 2026-10-23: `action.yml` and `src/action.ts`, threshold 400 changed lines (an input until Slice 2); proven by `.github/workflows/diffcarve.yml` on PR #11: silent at 369 lines under 400, then one comment posted and updated in place under this repo's 200-line threshold, each job under 20 seconds
 
 ## 🚦 Public release
 
