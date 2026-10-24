@@ -1,0 +1,22 @@
+name: DiffCarve
+
+# DiffCarve on its own PRs, from this checkout (./), not a published tag.
+on:
+  pull_request:
+    types: [opened, synchronize]
+
+permissions:
+  contents: read
+  pull-requests: write
+
+jobs:
+  carve:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0 # the merge base has to be in the clone
+      - uses: ./
+        with:
+          threshold: 200 # this repo holds itself to the sub-200-line layers it proposes
