@@ -1,0 +1,30 @@
+name: DiffCarve
+description: Proposes a dependency-ordered stack of small PRs for an oversized pull request, as one dry-run comment.
+author: ai-automation-tools
+branding:
+  icon: scissors
+  color: orange
+
+inputs:
+  threshold:
+    description: Lines changed (added plus deleted) at which DiffCarve comments. Under it, the Action does nothing.
+    default: "400"
+  token:
+    description: Token used to post the comment. Needs pull-requests write.
+    default: ${{ github.token }}
+
+runs:
+  using: composite
+  steps:
+    - uses: actions/setup-node@v4
+      with:
+        node-version: 22
+    - name: Install DiffCarve
+      shell: bash
+      run: npm ci --omit=dev --no-audit --no-fund --prefix "$GITHUB_ACTION_PATH"
+    - name: Carve the PR
+      shell: bash
+      run: node "$GITHUB_ACTION_PATH/src/action-main.ts"
+      env:
+        DIFFCARVE_THRESHOLD: ${{ inputs.threshold }}
+        GITHUB_TOKEN: ${{ inputs.token }}

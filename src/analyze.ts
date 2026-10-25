@@ -27,10 +27,10 @@ function git(cwd: string, args: string[]): string {
   return execFileSync("git", args, { cwd, encoding: "utf8", stdio: ["ignore", "pipe", "pipe"], maxBuffer: 1 << 28 });
 }
 
-// Diffs `branch` against its merge base with HEAD, so run it from the branch the PR targets.
-export function analyze(cwd: string, branch: string): Analysis {
-  if (branch.startsWith("-")) throw new Error(`Not a branch name: ${branch}`);
-  const mergeBase = git(cwd, ["merge-base", "HEAD", branch]).trim();
+// Diffs `branch` against its merge base with `base`, HEAD by default, so run it from the branch the PR targets.
+export function analyze(cwd: string, branch: string, base = "HEAD"): Analysis {
+  for (const ref of [branch, base]) if (ref.startsWith("-")) throw new Error(`Not a branch name: ${ref}`);
+  const mergeBase = git(cwd, ["merge-base", base, branch]).trim();
   const status = git(cwd, ["diff", "--name-status", "--no-renames", "-z", mergeBase, branch]).split("\0");
   status.pop(); // trailing NUL
   const lines = new Map<string, number>();
