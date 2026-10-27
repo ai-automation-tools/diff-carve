@@ -47,9 +47,9 @@ defaults work without it, and the routine builds it after release.
 
 ## 🚦 Public release
 
-- [ ] `small` **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run build`, `npm test` and `npm run lint` on push to `main` and on every PR, and the latest run on `main` is green.
-- [ ] `small` **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written.
-- [ ] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box.
+- [x] `small` **CI.** `.github/workflows/ci.yml` runs `npm ci`, `npm run build`, `npm test` and `npm run lint` on push to `main` and on every PR, and the latest run on `main` is green. — done 2026-10-26: `.github/workflows/ci.yml`, green on this item's PR; its first run on `main` is the merge itself, so check that one goes green
+- [x] `small` **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written. — done 2026-10-26: every Quick start command, `--dry-run`, `--version`, `--help` and a bad branch run against `dist/` on a scratch clone; the Action's `threshold` input was proven on PR #11; nothing needed changing
+- [x] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box. — done 2026-10-26: `SECURITY.md`; `gitleaks detect --log-opts="--all"` (8.30.1) scanned 22 commits, no leaks found
 - [ ] **Live demo at `https://ai-automation-tools.dev/diff-carve/`.** Served by GitHub Pages from this repo through a `actions/deploy-pages` workflow. A visitor picks a bundled sample diff and sees it carved into scored layers with nothing to install. The org source bar sits across the very top, linking `https://github.com/ai-automation-tools/diff-carve`. Safe to publish: the sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret. The README hero's Live Demo badge and nav links resolve to the Pages URL above the fold.
 
 ## After public release
