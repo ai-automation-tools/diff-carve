@@ -114,8 +114,9 @@ in the job see that Node.
 |:---|:---|
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI and Action source. |
-| [**⚙️ action.yml**](action.yml) | The GitHub Action. [`.github/workflows/diffcarve.yml`](.github/workflows/diffcarve.yml) runs it on this repo's own PRs. |
+| [**⚙️ action.yml**](action.yml) | The GitHub Action. [`.github/workflows/diffcarve.yml`](.github/workflows/diffcarve.yml) runs it on this repo's own PRs; [`ci.yml`](.github/workflows/ci.yml) builds, tests and lints every push and PR. |
 | [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
+| [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability privately. |
 | [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
 
 ---
