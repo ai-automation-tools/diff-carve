@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- Live demo at https://ai-automation-tools.dev/diff-carve/: pick one of four synthetic sample PRs (a layered feature, path aliases with a failing layer, two unrelated changes, a one-file fix) and see its layers, scores, the PR comment the Action would post, the CLI output and the diff. `demo/build.ts` (`npm run demo`) carves the samples with the real CLI at build time; the page is static, in the org house style with the source bar on top. `.github/workflows/pages.yml` builds it on every PR and deploys it to GitHub Pages from `main`. The README carries a Live Demo badge and nav link. *Public release: Live demo*
 - `.github/workflows/ci.yml`: `npm ci`, build, test and lint on every push to `main` and every PR. *Public release: CI*
 - `SECURITY.md`: report vulnerabilities privately through GitHub's advisory form; a full-history `gitleaks` scan came back clean. *Public release: Security*
 - GitHub Action, dry run only: `action.yml` runs on `pull_request` opened/synchronize, carves the PR head against its base, and under the threshold (400 changed lines, the `threshold` input) does nothing. Over it, it posts one comment with the proposed stack, or updates the one it posted before. Needs only `GITHUB_TOKEN` and calls nothing but the GitHub API; a fork's read-only token logs a warning instead of failing. `.github/workflows/diffcarve.yml` runs it on this repo's own PRs from `./`. `analyze()` takes an optional base ref (HEAD by default). *Build: Slice 3*

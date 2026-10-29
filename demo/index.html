@@ -1,0 +1,268 @@
+<!DOCTYPE html>
+<!-- Template for the live demo. demo/build.ts replaces the data placeholder below with the
+     real CLI's output for each sample. Edit here, not in _site/. -->
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <title>DiffCarve demo: carve a big PR into reviewable layers</title>
+  <meta name="description" content="Pick a sample pull request and see DiffCarve split it into a dependency-ordered stack of scored layers. Nothing to install." />
+  <link rel="icon" type="image/svg+xml" href="favicon.svg" />
+  <meta name="theme-color" content="#060606" />
+  <script>
+    // Pre-paint theme. Default must equal THEME_DEFAULT in the page script.
+    (function () {
+      var t = 'dark';
+      try { var s = localStorage.getItem('diff-carve.theme'); if (s === 'light' || s === 'dark') t = s; } catch (e) {}
+      document.documentElement.classList.add(t);
+      if (t === 'light') document.querySelector('meta[name="theme-color"]').setAttribute('content', '#fafafa');
+    })();
+  </script>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      color-scheme: dark;
+      --bg: #060606; --dots: rgba(255,255,255,.035);
+      --surface: rgba(24,24,27,.45); --surface-2: rgba(24,24,27,.8);
+      --field: rgba(24,24,27,.4); --hover-bg: rgba(24,24,27,.7);
+      --bar: rgba(6,6,6,.72); --bar-line: rgba(39,39,42,.7); --srcbar-bg: #0a0a0b;
+      --switch-bg: rgba(39,39,42,.6); --thumb: #27272a; --code-bg: #0a0a0b;
+      --line: rgba(63,63,70,.45); --line-2: rgba(63,63,70,.8); --line-hover: #52525b; --rule: rgba(39,39,42,.6);
+      --fg: #f4f4f5; --fg-2: #d4d4d8; --fg-3: #a1a1aa; --fg-4: #71717a; --fg-5: #52525b;
+      --accent: #e879f9; --accent-hover: #f0abfc; --accent-ink: #1a0b1c; --glow: rgba(232,121,249,.10);
+      --ok: #34d399; --bad: #fb7185;
+      --sans: 'Inter', system-ui, -apple-system, 'Segoe UI', sans-serif;
+      --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, Consolas, monospace;
+      --r-lg: 12px; --r-md: 8px; --r-sm: 6px;
+      --ease: cubic-bezier(.2,.7,.2,1);
+      --srcbar-h: 34px; --topbar-h: 56px;
+    }
+    html.light {
+      color-scheme: light;
+      --bg: #fafafa; --dots: rgba(0,0,0,.05);
+      --surface: rgba(255,255,255,.75); --surface-2: #fff;
+      --field: #fff; --hover-bg: #f4f4f5;
+      --bar: rgba(250,250,250,.8); --bar-line: #e4e4e7; --srcbar-bg: #f4f4f5;
+      --switch-bg: rgba(228,228,231,.6); --thumb: #d4d4d8; --code-bg: #f4f4f5;
+      --line: #e4e4e7; --line-2: #d4d4d8; --line-hover: #a1a1aa; --rule: #e4e4e7;
+      --fg: #09090b; --fg-2: #27272a; --fg-3: #52525b; --fg-4: #63636b; --fg-5: #76767f;
+      --accent: #a21caf; --accent-hover: #86198f; --accent-ink: #fff; --glow: rgba(232,121,249,.08);
+      --ok: #047857; --bad: #be123c;
+    }
+    * { box-sizing: border-box; }
+    html { -webkit-text-size-adjust: 100%; text-size-adjust: 100%; }
+    body {
+      margin: 0; background: var(--bg); color: var(--fg); font: 15px/1.6 var(--sans); -webkit-font-smoothing: antialiased;
+      background-image: radial-gradient(var(--dots) 1.2px, transparent 0); background-size: 24px 24px; background-attachment: fixed;
+    }
+    a { color: inherit; text-decoration: none; }
+    ::selection { background: color-mix(in srgb, var(--accent) 30%, transparent); }
+    ::-webkit-scrollbar { width: 6px; height: 6px; }
+    ::-webkit-scrollbar-thumb { background: var(--thumb); border-radius: 3px; }
+    :focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; border-radius: 4px; }
+    .skip { position: absolute; left: -9999px; top: 12px; z-index: 80; padding: 6px 12px; border-radius: 6px; background: var(--accent); color: var(--accent-ink); font-size: 14px; font-weight: 600; }
+    .skip:focus { left: 16px; }
+    .wrap { position: relative; z-index: 1; max-width: 1120px; margin: 0 auto; padding-inline: 20px; }
+    .eyebrow { font-family: var(--mono); font-size: 11.5px; letter-spacing: .14em; text-transform: uppercase; color: var(--fg-4); }
+    .eyebrow b { color: var(--accent); font-weight: 500; }
+    .mono { font-family: var(--mono); }
+
+    .src-bar { display: flex; align-items: center; gap: 16px; height: var(--srcbar-h); padding: 0 16px; background: var(--srcbar-bg); border-bottom: 1px solid var(--bar-line); font-size: 12px; }
+    .src-note { margin: 0; min-width: 0; overflow: hidden; white-space: nowrap; text-overflow: ellipsis; color: var(--fg-4); }
+    .src-note strong { font-weight: 600; color: var(--accent); }
+    .src-link { margin-left: auto; flex: none; display: inline-flex; align-items: center; gap: 6px; color: var(--fg-3); font-weight: 500; transition: color .15s; }
+    .src-link:hover { color: var(--fg); }
+
+    .topbar { position: sticky; top: env(safe-area-inset-top, 0px); z-index: 40; height: var(--topbar-h); background: var(--bar); backdrop-filter: blur(12px); -webkit-backdrop-filter: blur(12px); border-bottom: 1px solid var(--bar-line); }
+    .topbar .wrap { height: 100%; display: flex; align-items: center; gap: 14px; }
+    .brand { display: flex; align-items: center; gap: 10px; font-weight: 600; font-size: 14px; letter-spacing: -.01em; }
+    .brand img { width: 24px; height: 24px; flex: none; }
+    .topbar-right { margin-left: auto; display: flex; align-items: center; gap: 8px; }
+
+    .theme-sw { display: inline-flex; align-items: center; gap: 2px; padding: 2px; border-radius: 12px; background: var(--switch-bg); flex: none; }
+    .theme-sw button { display: inline-flex; align-items: center; justify-content: center; width: 28px; height: 24px; padding: 0; border: 0; border-radius: 10px; background: transparent; color: var(--fg-4); cursor: pointer; transition: color .15s, background-color .15s; }
+    .theme-sw button:hover { color: var(--fg); }
+    .theme-sw button[aria-pressed="true"] { background: var(--bg); color: var(--fg); box-shadow: 0 1px 2px rgb(0 0 0 / .05); }
+    .theme-sw button:focus-visible { outline: 2px solid color-mix(in srgb, var(--accent) 60%, transparent); outline-offset: 0; }
+    .theme-sw svg { width: 13px; height: 13px; }
+
+    .glow { position: absolute; inset: 0 0 auto 0; height: 560px; pointer-events: none; z-index: 0; background: radial-gradient(640px 360px at 70% 8%, var(--glow), transparent 70%); mask-image: linear-gradient(#000 60%, transparent); }
+    .hero { padding-block: 52px 28px; }
+    h1 { margin: 16px 0 0; font-size: clamp(32px, 4.4vw, 48px); line-height: 1.06; letter-spacing: -.035em; font-weight: 700; text-wrap: balance; }
+    h1 em { font-style: normal; color: var(--accent); }
+    .lede { margin: 18px 0 0; max-width: 62ch; font-size: 16px; color: var(--fg-3); }
+    h2 { margin: 8px 0 0; font-size: 22px; letter-spacing: -.02em; font-weight: 650; }
+    h3 { margin: 0; font-size: 16px; font-weight: 600; letter-spacing: -.01em; }
+
+    .picker { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 18px; }
+    .picker button { height: 36px; padding: 0 14px; border-radius: var(--r-md); border: 1px solid var(--line-2); background: var(--field); color: var(--fg-2); font: 500 13.5px var(--sans); cursor: pointer; transition: border-color .2s, background .2s, color .2s; }
+    .picker button:hover { border-color: var(--line-hover); color: var(--fg); }
+    .picker button[aria-selected="true"] { border-color: color-mix(in srgb, var(--accent) 60%, transparent); background: color-mix(in srgb, var(--accent) 14%, transparent); color: var(--fg); }
+
+    .panel { margin-top: 22px; padding-bottom: 56px; }
+    .summary { margin: 0; color: var(--fg-3); max-width: 70ch; }
+    .stats { margin-top: 10px; font-family: var(--mono); font-size: 12.5px; color: var(--fg-4); }
+    .message { margin-top: 18px; padding: 16px 18px; border: 1px dashed var(--line-2); border-radius: var(--r-lg); font-family: var(--mono); font-size: 13.5px; color: var(--fg-2); overflow-wrap: anywhere; }
+    .layers { display: grid; gap: 12px; margin-top: 18px; }
+    .layer { padding: 16px 18px; border: 1px solid var(--line); border-left: 3px solid var(--ok); border-radius: var(--r-lg); background: var(--surface); }
+    .layer.fail { border-left-color: var(--bad); }
+    .layer-head { display: flex; flex-wrap: wrap; align-items: baseline; gap: 6px 14px; }
+    .score { font-family: var(--mono); font-size: 13px; font-weight: 500; color: var(--ok); }
+    .layer.fail .score { color: var(--bad); }
+    .inputs { font-family: var(--mono); font-size: 12px; color: var(--fg-4); }
+    .files { list-style: none; margin: 10px 0 0; padding: 0; font-family: var(--mono); font-size: 13px; }
+    .files li { padding: 3px 0; overflow-wrap: anywhere; color: var(--fg-2); }
+    .files .dep { color: var(--fg-4); }
+    .outside { margin-top: 12px; font-size: 13px; color: var(--fg-4); overflow-wrap: anywhere; }
+
+    details { margin-top: 12px; border: 1px solid var(--line); border-radius: var(--r-lg); background: var(--surface); }
+    summary { padding: 12px 16px; cursor: pointer; font-weight: 500; font-size: 14px; color: var(--fg-2); }
+    summary:hover { color: var(--fg); }
+    pre { margin: 0; padding: 14px 16px; max-height: 480px; overflow: auto; background: var(--code-bg); border-top: 1px solid var(--line); border-radius: 0 0 var(--r-lg) var(--r-lg); font: 12.5px/1.55 var(--mono); color: var(--fg-2); }
+    pre .add { color: var(--ok); }
+    pre .del { color: var(--bad); }
+    pre .hunk { color: var(--accent); }
+
+    section { scroll-margin-top: 72px; padding-block: 44px; border-top: 1px solid var(--rule); }
+    .how { margin: 12px 0 0; padding-left: 20px; color: var(--fg-3); max-width: 72ch; }
+    .how li { margin-top: 6px; }
+    code { font-family: var(--mono); font-size: .9em; color: var(--fg-2); }
+
+    footer { border-top: 1px solid var(--rule); padding-block: 28px 40px; font-size: 13px; color: var(--fg-4); }
+    footer .row { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 12px; }
+    footer .right { display: flex; flex-wrap: wrap; gap: 16px; }
+    footer a:hover { color: var(--fg); }
+
+    @media (max-width: 600px) {
+      .theme-sw button { width: 36px; height: 32px; }
+      .picker button { flex: 1 1 100%; text-align: left; }
+      footer .right a { display: inline-block; padding-block: 9px; }
+    }
+    @media (prefers-reduced-motion: reduce) {
+      *, *::before, *::after { animation-duration: .01ms !important; animation-iteration-count: 1 !important; transition-duration: .01ms !important; }
+    }
+  </style>
+</head>
+<body>
+<a class="skip" href="#main">Skip to content</a>
+<div class="src-bar">
+  <p class="src-note"><strong>Demo</strong> &middot; synthetic sample PRs, carved by the real DiffCarve CLI when this page was built.</p>
+  <a class="src-link" href="https://github.com/ai-automation-tools/diff-carve" target="_blank" rel="noopener">
+    <svg viewBox="0 0 16 16" width="14" height="14" fill="currentColor" aria-hidden="true"><path d="M8 0C3.58 0 0 3.58 0 8c0 3.54 2.29 6.53 5.47 7.59.4.07.55-.17.55-.38 0-.19-.01-.82-.01-1.49-2.01.37-2.53-.49-2.69-.94-.09-.23-.48-.94-.82-1.13-.28-.15-.68-.52-.01-.53.63-.01 1.08.58 1.23.82.72 1.21 1.87.87 2.33.66.07-.52.28-.87.51-1.07-1.78-.2-3.64-.89-3.64-3.95 0-.87.31-1.59.82-2.15-.08-.2-.36-1.02.08-2.12 0 0 .67-.21 2.2.82.64-.18 1.32-.27 2-.27.68 0 1.36.09 2 .27 1.53-1.04 2.2-.82 2.2-.82.44 1.1.16 1.92.08 2.12.51.56.82 1.27.82 2.15 0 3.07-1.87 3.75-3.65 3.95.29.25.54.73.54 1.48 0 1.07-.01 1.93-.01 2.2 0 .21.15.46.55.38A8.013 8.013 0 0 0 16 8c0-4.42-3.58-8-8-8z"/></svg>
+    View source
+  </a>
+</div>
+
+<header class="topbar">
+  <div class="wrap">
+    <a class="brand" href="#"><img src="favicon.svg" alt="" />DiffCarve</a>
+    <div class="topbar-right">
+      <div class="theme-sw" id="themeSw" role="group" aria-label="Theme">
+        <button type="button" data-theme="light" aria-pressed="false" aria-label="Light theme" title="Light theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><circle cx="12" cy="12" r="4"/><path d="M12 2v2"/><path d="M12 20v2"/><path d="m4.93 4.93 1.41 1.41"/><path d="m17.66 17.66 1.41 1.41"/><path d="M2 12h2"/><path d="M20 12h2"/><path d="m6.34 17.66-1.41 1.41"/><path d="m19.07 4.93-1.41 1.41"/></svg></button>
+        <button type="button" data-theme="dark" aria-pressed="true" aria-label="Dark theme" title="Dark theme"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="M20.985 12.486a9 9 0 1 1-9.473-9.472c.405-.022.617.46.402.803a6 6 0 0 0 8.268 8.268c.344-.215.825-.004.803.401"/></svg></button>
+      </div>
+    </div>
+  </div>
+</header>
+
+<div class="glow" aria-hidden="true"></div>
+
+<main class="wrap" id="main">
+  <div class="hero">
+    <span class="eyebrow"><b>ai-automation-tools</b> · live demo</span>
+    <h1>Carve a big PR into <em>layers</em> a reviewer can finish.</h1>
+    <p class="lede">DiffCarve builds an import graph over the files a pull request changes and cuts it into a stack where no layer imports from a later one. Each layer gets a reviewability score with its inputs shown. Pick a sample below.</p>
+  </div>
+
+  <div class="picker" id="picker" role="tablist" aria-label="Sample pull requests"></div>
+  <div class="panel" id="panel" role="tabpanel" aria-live="polite"></div>
+
+  <section id="how">
+    <span class="eyebrow">How it scores</span>
+    <h2>Four inputs, 100 points</h2>
+    <ul class="how">
+      <li>Each input spends its share of 100 points as it climbs from 0 to twice its budget: lines changed 40 (budget 200), files touched 20 (10), cyclomatic complexity delta 25 (20), reverse dependencies 15 (5).</li>
+      <li>A layer scoring 50 or more passes. A layer sitting exactly on every budget scores 50.</li>
+      <li>Everything here is static analysis: the same diff always gives the same layers and score. No model, no server, and your code never leaves your machine or CI runner.</li>
+      <li>Run it yourself with <code>diffcarve analyze &lt;branch&gt; --dry-run</code>, or as a GitHub Action that comments on PRs over 400 changed lines.</li>
+    </ul>
+  </section>
+</main>
+
+<footer>
+  <div class="wrap row">
+    <span class="mono" id="stamp">ai-automation-tools.dev/diff-carve</span>
+    <div class="right">
+      <a href="https://ai-automation-tools.dev">ai-automation-tools.dev</a>
+      <a href="https://ai-automation-tools.dev/cookies.html">Cookies</a>
+      <a href="#" data-ail-consent="manage">Cookie settings</a>
+    </div>
+  </div>
+</footer>
+
+<script id="data" type="application/json">__DATA__</script>
+<script>
+  // Theme switch. THEME_DEFAULT must equal the pre-paint default in <head>.
+  const THEME_KEY = 'diff-carve.theme', THEME_DEFAULT = 'dark';
+  const themeBtns = document.querySelectorAll('#themeSw button');
+  function setTheme(t) {
+    const r = document.documentElement; r.classList.remove('light', 'dark'); r.classList.add(t);
+    themeBtns.forEach(b => b.setAttribute('aria-pressed', String(b.dataset.theme === t)));
+    document.querySelector('meta[name="theme-color"]').setAttribute('content', t === 'light' ? '#fafafa' : '#060606');
+  }
+  setTheme(document.documentElement.classList.contains('light') ? 'light' : THEME_DEFAULT);
+  themeBtns.forEach(b => b.addEventListener('click', () => { setTheme(b.dataset.theme); try { localStorage.setItem(THEME_KEY, b.dataset.theme); } catch (e) {} }));
+
+  // Samples: rendered from the JSON demo/build.ts baked in. textContent only, never innerHTML.
+  const { version, samples } = JSON.parse(document.getElementById('data').textContent);
+  document.getElementById('stamp').textContent = `ai-automation-tools.dev/diff-carve · diffcarve ${version}`;
+  const el = (tag, props = {}, ...kids) => { const e = Object.assign(document.createElement(tag), props); e.append(...kids); return e; };
+  const signed = n => (n > 0 ? `+${n}` : `${n}`);
+  const picker = document.getElementById('picker'), panel = document.getElementById('panel');
+
+  function codeBlock(label, text, diff) {
+    const pre = el('pre');
+    for (const line of text.split('\n')) {
+      const cls = !diff ? '' : line.startsWith('@@') ? 'hunk' : line.startsWith('+') && !line.startsWith('+++') ? 'add' : line.startsWith('-') && !line.startsWith('---') ? 'del' : '';
+      pre.append(cls ? el('span', { className: cls, textContent: line }) : line, '\n');
+    }
+    return el('details', {}, el('summary', { textContent: label }), pre);
+  }
+
+  function show(i) {
+    const s = samples[i];
+    [...picker.children].forEach((b, j) => { b.setAttribute('aria-selected', String(j === i)); b.tabIndex = j === i ? 0 : -1; });
+    const kids = [
+      el('h2', { textContent: s.title }),
+      el('p', { className: 'summary', textContent: s.note }),
+      el('div', { className: 'stats', textContent: `${s.files} files · ${s.lines} lines changed` + (s.layers.length ? ` · ${s.layers.length} layers` : '') }),
+    ];
+    if (s.message) kids.push(el('div', { className: 'message', textContent: s.message }));
+    const layers = el('div', { className: 'layers' });
+    s.layers.forEach((l, n) => layers.append(el('article', { className: 'layer' + (l.pass ? '' : ' fail') },
+      el('div', { className: 'layer-head' },
+        el('h3', { textContent: `Layer ${n + 1}` }),
+        el('span', { className: 'score', textContent: `score ${l.score} · ${l.pass ? 'pass' : 'fail'}` }),
+        el('span', { className: 'inputs', textContent: `${l.lines} lines · ${l.files} files · complexity ${signed(l.complexity)} · ${l.reverseDeps} reverse deps` })),
+      el('ul', { className: 'files' }, ...l.paths.map(f => el('li', {}, f.path,
+        f.imports.length ? el('span', { className: 'dep', textContent: `  ← imports ${f.imports.join(', ')}` }) : ''))))));
+    kids.push(layers);
+    if (s.outside.length) kids.push(el('div', { className: 'outside', textContent: `Outside the import graph (deleted or not TS/JS): ${s.outside.join(', ')}` }));
+    kids.push(codeBlock('The PR comment the Action would post (markdown)', s.comment), codeBlock('CLI output: diffcarve analyze pr', s.cli), codeBlock('The diff', s.diff, true));
+    panel.replaceChildren(...kids);
+    history.replaceState(null, '', '#' + s.id);
+  }
+
+  samples.forEach((s, i) => picker.append(el('button', { type: 'button', role: 'tab', textContent: s.title, onclick: () => show(i) })));
+  picker.addEventListener('keydown', e => {
+    const i = [...picker.children].indexOf(document.activeElement), d = { ArrowRight: 1, ArrowLeft: -1 }[e.key];
+    if (i < 0 || !d) return;
+    const j = (i + d + samples.length) % samples.length; show(j); picker.children[j].focus();
+  });
+  show(Math.max(0, samples.findIndex(s => '#' + s.id === location.hash)));
+</script>
+<script src="https://ai-automation-tools.dev/consent.js" defer></script>
+</body>
+</html>

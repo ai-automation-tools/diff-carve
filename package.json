@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "node --test",
-    "lint": "eslint . && tsc --noEmit"
+    "lint": "eslint . && tsc --noEmit",
+    "demo": "node demo/build.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
