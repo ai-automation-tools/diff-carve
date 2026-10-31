@@ -59,9 +59,9 @@ DiffCarve server, and your source code never leaves the runner.
 | Feature | Status |
 |:---|:---|
 | **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports, tsconfig `paths` and package.json `imports` aliases) |
-| **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50, with the lines, files, complexity delta and reverse dependencies behind it |
+| **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50 by default, with the lines, files, complexity delta and reverse dependencies behind it |
 | **`--dry-run`** | ✅ Built. Prints the proposed stack as PR-comment markdown |
-| **`diffcarve.yml`** | Slice 2. Line budget, trigger threshold, per-language boundary rules |
+| **`diffcarve.yml`** | ✅ Built. Trigger threshold, pass line, line/file/complexity/reverse-dep budgets, and per-language `exclude` globs, read from the branch the PR targets |
 | **GitHub Action** | ✅ Built, dry run only. Silent under the threshold (400 changed lines by default), otherwise posts or updates one comment. Needs only `GITHUB_TOKEN` |
 | **[Live demo](https://ai-automation-tools.dev/diff-carve/)** | ✅ Built. Pick a sample PR and see it carved into scored layers in the browser. The samples are synthetic and carved by the real CLI when the page builds |
 | **Stacked PR chains, merge gate, Python** | After public release |
@@ -108,12 +108,31 @@ jobs:
           fetch-depth: 0 # the merge base has to be in the clone
       - uses: ai-automation-tools/diff-carve@main
         with:
-          threshold: 400 # optional: lines changed (added plus deleted) before it comments
+          threshold: 400 # optional: overrides diffcarve.yml's threshold
 ```
 
 It never blocks or approves anything. On a fork's PR the token can't comment, so the step
 logs a warning and passes. It runs `actions/setup-node` with Node 22 first, so later steps
 in the job see that Node.
+
+### Configuration: `diffcarve.yml`
+
+Optional, at the repo root. The CLI reads it from HEAD and the Action from the PR's base
+branch, so a PR can't loosen its own budgets. Every key is optional; these are the
+defaults. An unknown key or a wrong type stops the run and names the key.
+
+```yaml
+threshold: 400       # lines changed (added plus deleted) before the Action comments
+pass: 50             # a layer scoring this or more passes (0 to 100)
+budgets:             # a layer exactly on every budget scores 50
+  lines: 200         # lines changed
+  files: 10          # files touched
+  complexity: 20     # cyclomatic complexity added: the complexity threshold
+  reverseDeps: 5     # changed files outside the layer that import it
+languages:
+  typescript:        # TS and JS
+    exclude: []      # globs kept outside the import graph, e.g. ["**/*.generated.ts"]
+```
 
 ## 🗂️ What's in here
 

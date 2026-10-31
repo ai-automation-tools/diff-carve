@@ -58,7 +58,7 @@ Nothing below blocks go-live.
 
 ### 🧩 Fast-follow slices
 
-- [ ] **Slice 2: `diffcarve.yml`.** Line budget, trigger threshold, complexity threshold, and per-language file-boundary rules read from `diffcarve.yml`, with the defaults documented. A test proves changing the config changes the output.
+- [x] **Slice 2: `diffcarve.yml`.** Line budget, trigger threshold, complexity threshold, and per-language file-boundary rules read from `diffcarve.yml`, with the defaults documented. A test proves changing the config changes the output. — done 2026-10-30: `src/config.ts`, defaults in the README's Configuration section; file-boundary rules are `languages.typescript.exclude` globs; `tests/config.test.ts` shows a tuned config changing the layers, scores, pass line and the Action's threshold
 - [ ] **Slice 4: stacked PR chain creation.** With `--dry-run` off, the Action opens the layers as a real GitHub Stacked PR chain. Check first whether the Stacked PR API can be called from an Action at all; if it can't, record what's missing in `docs/` and stop there.
 - [ ] **Slice 5: merge-blocking check with override.** A failing layer gets a failing check. A named second reviewer can override it, and the override leaves an audit entry.
 - [ ] **Slice 6: Python support.** A Python analyzer (the `ast` module) passes a smaller spike at a rate comparable to Slice 0's TypeScript results.

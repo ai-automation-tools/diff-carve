@@ -1,6 +1,7 @@
 import { createRequire } from "node:module";
 import { analyze, type Analysis } from "./analyze.ts";
-import { BUDGETS, PASS, scoreLayers, type LayerScore } from "./score.ts";
+import { DEFAULTS, loadConfig, type Config } from "./config.ts";
+import { WEIGHTS, scoreLayers, type LayerScore } from "./score.ts";
 
 const { version } = createRequire(import.meta.url)("../package.json") as { version: string };
 
@@ -12,7 +13,8 @@ Usage:
                                and score each one. Diffs against the merge base with
                                HEAD, so run it from the branch the PR targets.
                                --dry-run prints the proposed stack as the markdown
-                               a PR comment would carry.
+                               a PR comment would carry. Budgets, the pass line
+                               and excluded files come from diffcarve.yml on HEAD.
   diffcarve --version          Print the version
   diffcarve --help             Print this help
 `;
@@ -45,27 +47,29 @@ export function run(argv: string[], io: Io = defaultIo, cwd = process.cwd()): nu
     }
     const start = performance.now();
     let a: Analysis;
+    let config: Config;
     try {
-      a = analyze(cwd, branch);
+      config = loadConfig(cwd, "HEAD");
+      a = analyze(cwd, branch, "HEAD", config.languages.typescript.exclude);
     } catch (e) {
       // git failures carry the useful text on stderr.
       const msg = (e as { stderr?: string }).stderr?.trim() || (e as Error).message;
       io.err(`diffcarve: could not analyze ${branch}: ${msg}\n`);
       return 1;
     }
-    io.out((dryRun ? markdown : format)(a, (performance.now() - start) / 1000));
+    io.out((dryRun ? markdown : format)(a, (performance.now() - start) / 1000, config));
     return 0;
   }
   io.err(`Unknown command: ${cmd}\n\n${HELP}`);
   return 1;
 }
 
-export function format(a: Analysis, seconds: number): string {
+export function format(a: Analysis, seconds: number, config: Config = DEFAULTS): string {
   const base = a.mergeBase.slice(0, 7);
   if (a.changed.length === 0) return `${a.branch} changes nothing since merge base ${base}. Nothing to partition.\n`;
   if (a.changed.length === 1) return `${a.branch} changes one file (${a.changed[0]}). Nothing to partition.\n`;
   let s = `${a.branch}: ${a.changed.length} files changed since merge base ${base}, ${a.layers.length} layers.\n`;
-  const scores = scoreLayers(a);
+  const scores = scoreLayers(a, config);
   a.layers.forEach((files, i) => {
     const l = scores[i];
     s += `\nLayer ${i + 1}: score ${l.score}, ${l.pass ? "pass" : "fail"} (${l.lines} lines, ${l.files} files, `;
@@ -75,20 +79,22 @@ export function format(a: Analysis, seconds: number): string {
       s += `  ${f}${deps.length ? `  <- imports ${deps.join(", ")}` : ""}\n`;
     }
   });
-  if (a.outside.length) s += `\nOutside the import graph (deleted or not TS/JS)\n${a.outside.map((f) => `  ${f}\n`).join("")}`;
+  if (a.outside.length) s += `\nOutside the import graph (deleted, excluded, or not TS/JS)\n${a.outside.map((f) => `  ${f}\n`).join("")}`;
   return `${s}\nAnalyzed in ${seconds.toFixed(2)}s.\n`;
 }
 
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
 // The proposed stack as the body of a PR comment. Blocks nothing, approves nothing.
-export function markdown(a: Analysis, seconds: number): string {
-  if (a.changed.length < 2) return format(a, seconds);
-  const scores = scoreLayers(a);
+export function markdown(a: Analysis, seconds: number, config: Config = DEFAULTS): string {
+  if (a.changed.length < 2) return format(a, seconds, config);
+  const { pass, budgets: b } = config;
+  const w = WEIGHTS;
+  const scores = scoreLayers(a, config);
   const failing = scores.filter((l) => !l.pass).length;
   let s = `### DiffCarve: ${a.layers.length} layers proposed\n\n`;
   s += `\`${a.branch}\` changes ${a.changed.length} files since \`${a.mergeBase.slice(0, 7)}\`. `;
-  s += failing ? `${failing} of ${a.layers.length} layers score under ${PASS}.\n\n` : `Every layer scores ${PASS} or more.\n\n`;
+  s += failing ? `${failing} of ${a.layers.length} layers score under ${pass}.\n\n` : `Every layer scores ${pass} or more.\n\n`;
   s += "| Layer | Score | Lines | Files | Complexity Δ | Reverse deps |\n|--:|--:|--:|--:|--:|--:|\n";
   scores.forEach((l: LayerScore, i) => {
     s += `| ${i + 1} | ${l.score} ${l.pass ? "✅" : "❌"} | ${l.lines} | ${l.files} | ${signed(l.complexity)} | ${l.reverseDeps} |\n`;
@@ -97,10 +103,9 @@ export function markdown(a: Analysis, seconds: number): string {
     s += `\n<details><summary>Layer ${i + 1}</summary>\n\n${files.map((f) => `- \`${f}\``).join("\n")}\n\n</details>\n`;
   });
   if (a.outside.length) s += `\nOutside the import graph: ${a.outside.map((f) => `\`${f}\``).join(", ")}\n`;
-  const b = BUDGETS;
   s += `\nEach input spends its share of 100 points as it climbs from 0 to twice its budget: `;
-  s += `lines ${b.lines.weight} (budget ${b.lines.budget}), files ${b.files.weight} (${b.files.budget}), `;
-  s += `complexity ${b.complexity.weight} (${b.complexity.budget}), reverse deps ${b.reverseDeps.weight} (${b.reverseDeps.budget}). `;
-  s += `${PASS} or more passes. Dry run: nothing is blocked. Analyzed in ${seconds.toFixed(2)}s.\n`;
+  s += `lines ${w.lines} (budget ${b.lines}), files ${w.files} (${b.files}), `;
+  s += `complexity ${w.complexity} (${b.complexity}), reverse deps ${w.reverseDeps} (${b.reverseDeps}). `;
+  s += `${pass} or more passes. Dry run: nothing is blocked. Analyzed in ${seconds.toFixed(2)}s.\n`;
   return s;
 }
