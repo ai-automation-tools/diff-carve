@@ -7,8 +7,8 @@ branding:
 
 inputs:
   threshold:
-    description: Lines changed (added plus deleted) at which DiffCarve comments. Under it, the Action does nothing.
-    default: "400"
+    description: Lines changed (added plus deleted) at which DiffCarve comments. Under it, the Action does nothing. Empty means diffcarve.yml's threshold on the base branch, else 400.
+    default: ""
   token:
     description: Token used to post the comment. Needs pull-requests write.
     default: ${{ github.token }}

@@ -11,6 +11,8 @@
 </p>
 
 <p align="center">
+  <a href="https://ai-automation-tools.dev/diff-carve/">Live Demo</a>
+  ·
   <a href="docs/ROADMAP.md">Roadmap</a>
   ·
   <a href="https://github.com/ai-automation-tools/diff-carve/issues">Report Bug</a>
@@ -19,6 +21,7 @@
 </p>
 
 <p align="center">
+  <a href="https://ai-automation-tools.dev/diff-carve/"><img src="https://img.shields.io/badge/live_demo-ai--automation--tools.dev%2Fdiff--carve-E879F9?style=for-the-badge&logo=github&logoColor=white" alt="Live demo at ai-automation-tools.dev/diff-carve"></a>
   <img src="https://img.shields.io/badge/status-MVP_Prototype-F59E0B?style=for-the-badge" alt="Status: MVP prototype">
   <a href="docs/ROADMAP.md"><img src="https://img.shields.io/badge/plan-ROADMAP-8B5CF6?style=for-the-badge" alt="Roadmap"></a>
   <a href="LICENSE"><img src="https://img.shields.io/badge/license-MIT-2ea44f?style=for-the-badge" alt="License: MIT"></a>
@@ -56,10 +59,11 @@ DiffCarve server, and your source code never leaves the runner.
 | Feature | Status |
 |:---|:---|
 | **`diffcarve analyze <branch>`** | ✅ Built. Dependency-ordered layers from a ts-morph import graph (relative imports, tsconfig `paths` and package.json `imports` aliases) |
-| **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50, with the lines, files, complexity delta and reverse dependencies behind it |
+| **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50 by default, with the lines, files, complexity delta and reverse dependencies behind it |
 | **`--dry-run`** | ✅ Built. Prints the proposed stack as PR-comment markdown |
-| **`diffcarve.yml`** | Slice 2. Line budget, trigger threshold, per-language boundary rules |
+| **`diffcarve.yml`** | ✅ Built. Trigger threshold, pass line, line/file/complexity/reverse-dep budgets, and per-language `exclude` globs, read from the branch the PR targets |
 | **GitHub Action** | ✅ Built, dry run only. Silent under the threshold (400 changed lines by default), otherwise posts or updates one comment. Needs only `GITHUB_TOKEN` |
+| **[Live demo](https://ai-automation-tools.dev/diff-carve/)** | ✅ Built. Pick a sample PR and see it carved into scored layers in the browser. The samples are synthetic and carved by the real CLI when the page builds |
 | **Stacked PR chains, merge gate, Python** | After public release |
 
 ## 🚀 Quick start
@@ -80,6 +84,9 @@ node dist/cli.js analyze my-feature-branch --dry-run
 
 # 5. Tests and lint
 npm test && npm run lint
+
+# 6. Build the demo page into _site/ (open _site/index.html)
+npm run demo
 ```
 
 ### As a GitHub Action
@@ -101,12 +108,31 @@ jobs:
           fetch-depth: 0 # the merge base has to be in the clone
       - uses: ai-automation-tools/diff-carve@main
         with:
-          threshold: 400 # optional: lines changed (added plus deleted) before it comments
+          threshold: 400 # optional: overrides diffcarve.yml's threshold
 ```
 
 It never blocks or approves anything. On a fork's PR the token can't comment, so the step
 logs a warning and passes. It runs `actions/setup-node` with Node 22 first, so later steps
 in the job see that Node.
+
+### Configuration: `diffcarve.yml`
+
+Optional, at the repo root. The CLI reads it from HEAD and the Action from the PR's base
+branch, so a PR can't loosen its own budgets. Every key is optional; these are the
+defaults. An unknown key or a wrong type stops the run and names the key.
+
+```yaml
+threshold: 400       # lines changed (added plus deleted) before the Action comments
+pass: 50             # a layer scoring this or more passes (0 to 100)
+budgets:             # a layer exactly on every budget scores 50
+  lines: 200         # lines changed
+  files: 10          # files touched
+  complexity: 20     # cyclomatic complexity added: the complexity threshold
+  reverseDeps: 5     # changed files outside the layer that import it
+languages:
+  typescript:        # TS and JS
+    exclude: []      # globs kept outside the import graph, e.g. ["**/*.generated.ts"]
+```
 
 ## 🗂️ What's in here
 
@@ -115,6 +141,7 @@ in the job see that Node.
 | [**📚 docs/**](docs/README.md) | The roadmap, the changelog, and the product spec and build plan. |
 | [**🧰 src/**](src/README.md) | The CLI and Action source. |
 | [**⚙️ action.yml**](action.yml) | The GitHub Action. [`.github/workflows/diffcarve.yml`](.github/workflows/diffcarve.yml) runs it on this repo's own PRs; [`ci.yml`](.github/workflows/ci.yml) builds, tests and lints every push and PR. |
+| [**🎬 demo/**](demo/) | The live demo: sample PRs, the page template, and `build.ts`, which carves the samples with the real CLI. [`pages.yml`](.github/workflows/pages.yml) builds it on every PR and deploys it to GitHub Pages from `main`. |
 | [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability privately. |
 | [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |

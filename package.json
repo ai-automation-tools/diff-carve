@@ -17,7 +17,8 @@
   "scripts": {
     "build": "tsc -p tsconfig.build.json",
     "test": "node --test",
-    "lint": "eslint . && tsc --noEmit"
+    "lint": "eslint . && tsc --noEmit",
+    "demo": "node demo/build.ts"
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
@@ -27,6 +28,7 @@
     "typescript-eslint": "^8.70.1"
   },
   "dependencies": {
-    "ts-morph": "^28.0.0"
+    "ts-morph": "^28.0.0",
+    "yaml": "^2.9.1"
   }
 }
