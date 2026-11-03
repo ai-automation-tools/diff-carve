@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Added**
+- `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - `diffcarve.yml`: the trigger threshold, the pass line, the four score budgets (lines, files, complexity, reverse deps) and per-language `exclude` globs, all optional over documented defaults and read from the branch the PR targets. Unknown keys and wrong types fail with the key named. The Action's `threshold` input now defaults to empty, so the config's value applies unless the input is set. Adds the `yaml` dependency. *Fast-follow: Slice 2*
 - Live demo at https://ai-automation-tools.dev/diff-carve/: pick one of four synthetic sample PRs (a layered feature, path aliases with a failing layer, two unrelated changes, a one-file fix) and see its layers, scores, the PR comment the Action would post, the CLI output and the diff. `demo/build.ts` (`npm run demo`) carves the samples with the real CLI at build time; the page is static, in the org house style with the source bar on top. `.github/workflows/pages.yml` builds it on every PR and deploys it to GitHub Pages from `main`. The README carries a Live Demo badge and nav link. *Public release: Live demo*
 - `.github/workflows/ci.yml`: `npm ci`, build, test and lint on every push to `main` and every PR. *Public release: CI*
