@@ -1,16 +1,11 @@
 import { ts } from "ts-morph";
 import type { Analysis } from "./analyze.ts";
+import { DEFAULTS, type Config } from "./config.ts";
 
 // Each input spends its share of 100 points as it climbs from 0 to twice its budget, so a
-// layer sitting exactly on every budget scores 50, the pass line. Slice 2 moves these into
-// diffcarve.yml.
-export const BUDGETS = {
-  lines: { budget: 200, weight: 40 },
-  files: { budget: 10, weight: 20 },
-  complexity: { budget: 20, weight: 25 },
-  reverseDeps: { budget: 5, weight: 15 },
-} as const;
-export const PASS = 50;
+// layer sitting exactly on every budget scores 50, the default pass line. Budgets and the
+// pass line come from diffcarve.yml; the weights are fixed.
+export const WEIGHTS = { lines: 40, files: 20, complexity: 25, reverseDeps: 15 } as const;
 
 export type LayerScore = {
   score: number;
@@ -24,7 +19,7 @@ export type LayerScore = {
   reverseDeps: number;
 };
 
-export function scoreLayers(a: Analysis): LayerScore[] {
+export function scoreLayers(a: Analysis, config: Config = DEFAULTS): LayerScore[] {
   const at = new Map(a.layers.flatMap((files, i) => files.map((f) => [f, i] as const)));
   return a.layers.map((files, i) => {
     const importers = new Set<string>();
@@ -36,13 +31,12 @@ export function scoreLayers(a: Analysis): LayerScore[] {
       reverseDeps: importers.size,
     };
     let spent = 0;
-    for (const k of Object.keys(BUDGETS) as (keyof typeof BUDGETS)[]) {
-      const { budget, weight } = BUDGETS[k];
+    for (const k of Object.keys(WEIGHTS) as (keyof typeof WEIGHTS)[]) {
       // A drop in complexity spends nothing; it doesn't earn points back either.
-      spent += weight * Math.min(1, Math.max(0, inputs[k]) / (2 * budget));
+      spent += WEIGHTS[k] * Math.min(1, Math.max(0, inputs[k]) / (2 * config.budgets[k]));
     }
     const score = Math.round(100 - spent);
-    return { score, pass: score >= PASS, ...inputs };
+    return { score, pass: score >= config.pass, ...inputs };
   });
 }
 

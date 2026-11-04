@@ -3,7 +3,8 @@ import assert from "node:assert/strict";
 import { rmSync } from "node:fs";
 import { analyze, layer } from "../src/analyze.ts";
 import { run } from "../src/run.ts";
-import { BUDGETS, PASS, complexity, scoreLayers } from "../src/score.ts";
+import { DEFAULTS } from "../src/config.ts";
+import { complexity, scoreLayers } from "../src/score.ts";
 import { fixtureRepo } from "./fixture.ts";
 
 const layered = {
@@ -154,12 +155,12 @@ test("a layer on every budget scores exactly the pass line; a huge one scores 0"
       complexity: new Map(low.map((f) => [f, cx])),
     };
   };
-  const b = BUDGETS;
-  const n = b.files.budget;
-  assert.deepEqual(scoreLayers(stack(n, b.lines.budget / n, b.complexity.budget / n, b.reverseDeps.budget))[0], {
-    score: PASS, pass: true, lines: 200, files: 10, complexity: 20, reverseDeps: 5,
+  const b = DEFAULTS.budgets;
+  const n = b.files;
+  assert.deepEqual(scoreLayers(stack(n, b.lines / n, b.complexity / n, b.reverseDeps))[0], {
+    score: DEFAULTS.pass, pass: true, lines: 200, files: 10, complexity: 20, reverseDeps: 5,
   });
-  assert.equal(scoreLayers(stack(2 * n, b.lines.budget, b.complexity.budget, 2 * b.reverseDeps.budget))[0].score, 0);
+  assert.equal(scoreLayers(stack(2 * n, b.lines, b.complexity, 2 * b.reverseDeps))[0].score, 0);
   // Taking complexity out earns nothing back.
   assert.equal(scoreLayers(stack(1, 0, -9, 0))[0].score, scoreLayers(stack(1, 0, 0, 0))[0].score);
   assert.equal(scoreLayers(stack(1, 0, -9, 0))[0].complexity, -9);

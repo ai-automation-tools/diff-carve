@@ -10,7 +10,7 @@ export type Analysis = {
   changed: string[];
   // Dependency-ordered: nothing in layers[i] imports from layers[j] when j > i.
   layers: string[][];
-  // Changed files outside the import graph: deleted, or not TS/JS.
+  // Changed files outside the import graph: deleted, excluded by diffcarve.yml, or not TS/JS.
   outside: string[];
   // Import edges between changed files, importer -> imported.
   imports: Map<string, string[]>;
@@ -28,7 +28,8 @@ function git(cwd: string, args: string[]): string {
 }
 
 // Diffs `branch` against its merge base with `base`, HEAD by default, so run it from the branch the PR targets.
-export function analyze(cwd: string, branch: string, base = "HEAD"): Analysis {
+// Files matching an `exclude` glob stay outside the import graph.
+export function analyze(cwd: string, branch: string, base = "HEAD", exclude: string[] = []): Analysis {
   for (const ref of [branch, base]) if (ref.startsWith("-")) throw new Error(`Not a branch name: ${ref}`);
   const mergeBase = git(cwd, ["merge-base", base, branch]).trim();
   const status = git(cwd, ["diff", "--name-status", "--no-renames", "-z", mergeBase, branch]).split("\0");
@@ -48,7 +49,7 @@ export function analyze(cwd: string, branch: string, base = "HEAD"): Analysis {
   for (let i = 0; i < status.length; i += 2) {
     const [kind, path] = [status[i], status[i + 1]];
     changed.push(path);
-    if (kind === "D" || !CODE.test(path)) outside.push(path);
+    if (kind === "D" || !CODE.test(path) || exclude.some((g) => posix.matchesGlob(path, g))) outside.push(path);
     else {
       const text = git(cwd, ["show", `${branch}:${path}`]);
       project.createSourceFile(`/${path}`, text);
