@@ -30,5 +30,8 @@
   "dependencies": {
     "ts-morph": "^28.0.0",
     "yaml": "^2.9.1"
+  },
+  "overrides": {
+    "minimatch": "^11.0.1"
   }
 }
