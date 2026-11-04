@@ -22,10 +22,10 @@
   },
   "devDependencies": {
     "@eslint/js": "^9.39.5",
-    "@types/node": "^22.20.4",
+    "@types/node": "^22.20.5",
     "eslint": "^9.39.5",
     "typescript": "~6.0",
-    "typescript-eslint": "^8.70.1"
+    "typescript-eslint": "^8.72.1"
   },
   "dependencies": {
     "ts-morph": "^28.0.0",
