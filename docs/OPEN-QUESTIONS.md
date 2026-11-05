@@ -1,6 +1,6 @@
 # Open questions
 
-Decisions only Mike can make. The roadmap agent asks here; an entry with a filled
+Decisions only the owner can make. The roadmap agent asks here; an entry with a filled
 `- Answer:` line gets applied on the next run and moves to Answered.
 
 ## Open
