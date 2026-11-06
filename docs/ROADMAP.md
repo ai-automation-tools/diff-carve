@@ -13,7 +13,7 @@
 ---
 
 The Diff-Carve Weekly Roadmap routine works this file top to bottom every Monday, Wednesday and Friday: it
-takes the first open item that isn't `🔒 Needs Mike` (or up to six `small` ones), builds
+takes the first open item that isn't `🔒 Needs owner` (or up to six `small` ones), builds
 it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `## After public
 release` is a release gate.** DiffCarve goes public when all of them are ticked and Mike
 says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and updates any doc
@@ -21,7 +21,7 @@ it made stale, in the same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
 (the reason follows on the line). `small` marks docs or config a run can batch, up to six
-per PR (untagged means a feature, one per run); `🔒 Needs Mike` marks one only Mike can do.
+per PR (untagged means a feature, one per run); `🔒 Needs owner` marks one only the owner can do.
 
 The slices come from [product/build-plan.md](product/build-plan.md). Slices 4 to 6
 (stacked PR chains, merge blocking, Python) sit below the release line because the build
@@ -34,7 +34,7 @@ defaults work without it, and the routine builds it after release.
 
 - [x] **Slice 0a: the spike analyzer.** `diffcarve analyze <branch>` builds a ts-morph import graph over the files a branch changes versus its merge base and prints dependency-ordered layers, where no layer imports from a later one. A diff of one file says there's nothing to partition; an empty diff says so too. Neither is an error. Unit tests cover a fixture repo with a known schema → data → API → UI layering and assert that order. — done 2026-09-23: `src/analyze.ts`; relative imports only, tsconfig `paths` aliases not resolved yet
 - [x] **Slice 0b: run the spike.** Pick ten public, merged, open-source TS/JS PRs over 400 changed lines, preferring ones an AI agent wrote. Run the analyzer on each and write `docs/SPIKE_RESULTS.md` with the PR links, each layer breakdown, the analysis time, and a proposed sensible/arbitrary verdict with a one-line reason per PR. — done 2026-09-30: [SPIKE_RESULTS.md](SPIKE_RESULTS.md); proposed 6 of 10 sensible, 3 misses from unresolved path aliases, see [OPEN-QUESTIONS.md](OPEN-QUESTIONS.md)
-- [x] 🔒 Needs Mike: **spike sign-off.** Read `docs/SPIKE_RESULTS.md` and record the real verdict per PR in it. 7 or more sensible out of 10 passes. At 5 or fewer, the decision memo's falsifier applies: park DiffCarve and publish the findings instead of building on. — done 2026-10-12: Mike signed off on the results as they stand, 6 of 10 sensible; applied 2026-10-14
+- [x] 🔒 Needs owner: **spike sign-off.** Read `docs/SPIKE_RESULTS.md` and record the real verdict per PR in it. 7 or more sensible out of 10 passes. At 5 or fewer, the decision memo's falsifier applies: park DiffCarve and publish the findings instead of building on. — done 2026-10-12: Mike signed off on the results as they stand, 6 of 10 sensible; applied 2026-10-14
 
 ## 📊 Slice 1: CLI core, scoring and `--dry-run` output (done 2026-10-14)
 
@@ -65,14 +65,14 @@ Nothing below blocks go-live.
 
 ### 📣 Publish and promote
 
-- [ ] Publish the Action to the GitHub Marketplace. 🔒 Needs Mike
-- [ ] Publish the CLI to npm as `diffcarve` (check the name is still free first). 🔒 Needs Mike
-- [ ] Launch post with one real before/after carve, sent to the two or three places tech leads running AI agents read. 🔒 Needs Mike
-- [ ] Custom subdomain `diff-carve.ai-automation-tools.dev`. 🔒 Needs Mike
+- [ ] Publish the Action to the GitHub Marketplace. 🔒 Needs owner
+- [ ] Publish the CLI to npm as `diffcarve` (check the name is still free first). 🔒 Needs owner
+- [ ] Launch post with one real before/after carve, sent to the two or three places tech leads running AI agents read. 🔒 Needs owner
+- [ ] Custom subdomain `diff-carve.ai-automation-tools.dev`. 🔒 Needs owner
 
 ### 💰 Revenue
 
-- [ ] Decide whether a paid tier (org dashboards, Slack/Teams alerts, cross-repo policy) is worth scoping, using star, fork, and Marketplace-install counts. Its own ADR if yes. 🔒 Needs Mike
+- [ ] Decide whether a paid tier (org dashboards, Slack/Teams alerts, cross-repo policy) is worth scoping, using star, fork, and Marketplace-install counts. Its own ADR if yes. 🔒 Needs owner
 
 ---
 
