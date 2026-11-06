@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Fixed**
+- `README.md`: the intro box no longer says "No config file yet"; it points at `diffcarve.yml`, which the Features table and the `diffcarve.yml` entry under **Added** call built.
+
 **Added**
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - `diffcarve.yml`: the trigger threshold, the pass line, the four score budgets (lines, files, complexity, reverse deps) and per-language `exclude` globs, all optional over documented defaults and read from the branch the PR targets. Unknown keys and wrong types fail with the key named. The Action's `threshold` input now defaults to empty, so the config's value applies unless the input is set. Adds the `yaml` dependency. *Fast-follow: Slice 2*
