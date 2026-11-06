@@ -29,6 +29,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - Moved to the org folder layout: the agent instructions are in `AGENTS.md` now (Codex, Gemini CLI and opencode read it), and `CLAUDE.md` is a bare `@AGENTS.md` import for Claude Code. The test folder is `tests/` instead of `test/`, with every path that named it updated.
 
 **Docs**
+- `docs/README.md` now links `UPSTREAMS.md`, which no doc pointed to before.
 - README usage checked against the real build: every command, flag and Action input behaves as written, no changes needed. *Public release: README usage*
 - `OPEN-QUESTIONS.md`: Mike's answer on path aliases applied; the roadmap gains a Path aliases item after Slice 1.
 - 2026-10-19: release scope cut to the MVP (pipeline change, Mike). Slice 2, config, moved below `## After public release`; the demo-safety and README-hero items folded into the live-demo item; the routine now runs Mon/Wed/Fri and batches up to six `small` items. No item dropped.
