@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Fixed**
+- `README.md`: the intro box no longer says "No config file yet"; it points at `diffcarve.yml`, which the Features table and the `diffcarve.yml` entry under **Added** call built.
+
 **Added**
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - `diffcarve.yml`: the trigger threshold, the pass line, the four score budgets (lines, files, complexity, reverse deps) and per-language `exclude` globs, all optional over documented defaults and read from the branch the PR targets. Unknown keys and wrong types fail with the key named. The Action's `threshold` input now defaults to empty, so the config's value applies unless the input is set. Adds the `yaml` dependency. *Fast-follow: Slice 2*
@@ -29,6 +32,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - Moved to the org folder layout: the agent instructions are in `AGENTS.md` now (Codex, Gemini CLI and opencode read it), and `CLAUDE.md` is a bare `@AGENTS.md` import for Claude Code. The test folder is `tests/` instead of `test/`, with every path that named it updated.
 
 **Docs**
+- `docs/README.md` now links `UPSTREAMS.md`, which no doc pointed to before.
 - README usage checked against the real build: every command, flag and Action input behaves as written, no changes needed. *Public release: README usage*
 - `OPEN-QUESTIONS.md`: Mike's answer on path aliases applied; the roadmap gains a Path aliases item after Slice 1.
 - 2026-10-19: release scope cut to the MVP (pipeline change, Mike). Slice 2, config, moved below `## After public release`; the demo-safety and README-hero items folded into the live-demo item; the routine now runs Mon/Wed/Fri and batches up to six `small` items. No item dropped.

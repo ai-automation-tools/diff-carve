@@ -39,7 +39,7 @@
 > [!WARNING]
 > **Early CLI and Action.** `diffcarve analyze <branch>` prints dependency-ordered layers
 > with a reviewability score on each, and `--dry-run` prints the same thing as a PR comment.
-> The GitHub Action posts that comment on PRs over 400 changed lines. No config file yet. On ten real oversized PRs the layers came out sensible
+> The GitHub Action posts that comment on PRs over 400 changed lines. Thresholds and score budgets come from an optional [`diffcarve.yml`](#configuration-diffcarveyml). On ten real oversized PRs the layers came out sensible
 > on 6 ([results](docs/SPIKE_RESULTS.md)), signed off as enough to keep building. See the
 > [roadmap](docs/ROADMAP.md).
 
