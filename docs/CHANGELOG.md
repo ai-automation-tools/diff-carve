@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Changed**
+- `docs/UPSTREAMS.md`: first full check of all rows; the pinned-Actions row now records that checkout, setup-node and deploy-pages v4 still run on Node 20, and the ESLint row records that ESLint 9 is past its last release. Two ROADMAP items queue the Actions bump and the ESLint 10 move.
+
 **Fixed**
 - `README.md`: the intro box no longer says "No config file yet"; it points at `diffcarve.yml`, which the Features table and the `diffcarve.yml` entry under **Added** call built.
 
