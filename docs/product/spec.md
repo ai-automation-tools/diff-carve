@@ -68,7 +68,7 @@ Both jobs are traced to `analysis/landscape.md` (the gap: existing tools navigat
 
 - **Does the import-graph analysis actually work well enough on messy diffs?** Owner: the spike (build plan Slice 0). Answer needed before Slice 1 (the GitHub Action) is scoped in detail.
 - **What line/file threshold should ship as the default?** `[assum]` placeholder of 400 lines is a guess; the spike's ten real PRs should suggest a more grounded default.
-- **Does GitHub's Stacked PR API support programmatic stack creation from an Action today, or only from the `gh` CLI/UI?** Unverified — `research/github-stacked-prs-changelog.md` confirms a `gh` CLI extension exists but doesn't confirm a stable Action-callable API. This is a build-plan risk, not resolved here.
+- **Does GitHub's Stacked PR API support programmatic stack creation from an Action today, or only from the `gh` CLI/UI?** Unverified — `research/github-stacked-prs-changelog.md` confirms a `gh` CLI extension exists but doesn't confirm a stable Action-callable API. This is a build-plan risk, not resolved here. *Resolved 2026-11-09 (Slice 4):* yes. Stacked PRs went GA on 2026-10-06 and the REST [Stacks API](https://docs.github.com/en/rest/pulls/stacks) (public preview) creates a stack from PR numbers; a workflow's `GITHUB_TOKEN` with `contents: write` and `pull-requests: write` is enough, proven on DiffCarve's own PR.
 
 ---
 

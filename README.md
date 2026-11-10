@@ -62,9 +62,10 @@ DiffCarve server, and your source code never leaves the runner.
 | **Reviewability score** | ✅ Built. 0 to 100 per layer, pass at 50 by default, with the lines, files, complexity delta and reverse dependencies behind it |
 | **`--dry-run`** | ✅ Built. Prints the proposed stack as PR-comment markdown |
 | **`diffcarve.yml`** | ✅ Built. Trigger threshold, pass line, line/file/complexity/reverse-dep budgets, and per-language `exclude` globs, read from the branch the PR targets |
-| **GitHub Action** | ✅ Built, dry run only. Silent under the threshold (400 changed lines by default), otherwise posts or updates one comment. Needs only `GITHUB_TOKEN` |
+| **GitHub Action** | ✅ Built. Silent under the threshold (400 changed lines by default), otherwise posts or updates one comment. Needs only `GITHUB_TOKEN` |
+| **Stacked PR chains** | ✅ Built, opt-in. With `dry-run: false` the Action also opens the layers as a [GitHub stack](https://docs.github.com/en/rest/pulls/stacks) of PRs, once per PR |
 | **[Live demo](https://ai-automation-tools.dev/diff-carve/)** | ✅ Built. Pick a sample PR and see it carved into scored layers in the browser. The samples are synthetic and carved by the real CLI when the page builds |
-| **Stacked PR chains, merge gate, Python** | After public release |
+| **Merge gate, Python** | After public release |
 
 ## 🚀 Quick start
 
@@ -112,7 +113,19 @@ jobs:
 ```
 
 It never blocks or approves anything. On a fork's PR the token can't comment, so the step
-logs a warning and passes. It runs `actions/setup-node` with Node 22 first, so later steps
+logs a warning and passes.
+
+**Opening the stack for real.** Add `dry-run: false` under `with:` and grant
+`contents: write` next to `pull-requests: write`. Over the threshold, the Action then builds
+one branch per layer (`diffcarve/<pr>/layer-<n>`, each the layers below it plus its own
+files as they are at the PR head, with deleted and non-TS/JS files in the top layer), opens
+a PR for each based on the one below, joins them with GitHub's
+[Stacks API](https://docs.github.com/en/rest/pulls/stacks) (public preview), and names
+them in its comment. It carves each PR once: later pushes leave the stack alone until you
+delete the `diffcarve/<pr>/` branches. The original PR stays open, and nothing is merged,
+closed or approved. PRs a workflow opens with `GITHUB_TOKEN` don't trigger other workflows,
+so CI won't run on the layer PRs until someone pushes to them; pass a PAT or GitHub App
+token as `token` if you need it to. It runs `actions/setup-node` with Node 22 first, so later steps
 in the job see that Node.
 
 ### Configuration: `diffcarve.yml`

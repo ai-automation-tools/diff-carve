@@ -6,7 +6,7 @@ on:
     types: [opened, synchronize]
 
 permissions:
-  contents: read
+  contents: write # TEMP: proving Slice 4 on PR #24
   pull-requests: write
 
 jobs:
@@ -20,3 +20,4 @@ jobs:
       - uses: ./
         with:
           threshold: 200 # this repo holds itself to the sub-200-line layers it proposes
+          dry-run: false # TEMP: proving Slice 4 on PR #24

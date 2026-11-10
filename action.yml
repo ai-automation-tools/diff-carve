@@ -1,5 +1,5 @@
 name: DiffCarve
-description: Proposes a dependency-ordered stack of small PRs for an oversized pull request, as one dry-run comment.
+description: Carves an oversized pull request into a dependency-ordered stack of small PRs, as one dry-run comment or a real GitHub stack.
 author: ai-automation-tools
 branding:
   icon: scissors
@@ -9,8 +9,11 @@ inputs:
   threshold:
     description: Lines changed (added plus deleted) at which DiffCarve comments. Under it, the Action does nothing. Empty means diffcarve.yml's threshold on the base branch, else 400.
     default: ""
+  dry-run:
+    description: true (the default) only comments. false also opens the layers as a GitHub stack of PRs, once per PR, and needs contents write too.
+    default: "true"
   token:
-    description: Token used to post the comment. Needs pull-requests write.
+    description: Token used to post the comment. Needs pull-requests write, plus contents write when dry-run is false.
     default: ${{ github.token }}
 
 runs:
@@ -27,4 +30,5 @@ runs:
       run: node "$GITHUB_ACTION_PATH/src/action-main.ts"
       env:
         DIFFCARVE_THRESHOLD: ${{ inputs.threshold }}
+        DIFFCARVE_DRY_RUN: ${{ inputs.dry-run }}
         GITHUB_TOKEN: ${{ inputs.token }}
