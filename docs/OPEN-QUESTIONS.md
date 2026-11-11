@@ -5,12 +5,15 @@ Decisions only the owner can make. The roadmap agent asks here; an entry with a 
 
 ## Open
 
+None right now.
+
+## Answered
+
 ### PR #13 holds the demo go-live and Slice 2: merge both, or split Slice 2 out first?
 - Asked: 2026-11-02 by diff-carve-roadmap
 - Context: PR #13 (`roadmap/auto-2026-10-28`) is held for two reasons: `.github/workflows/pages.yml` publishes the demo on merge, which is your go-live call, and the PR now carries a second feature, Slice 2 (`diffcarve.yml`). Append-mode runs add to this PR and can't rewrite it, so every new feature would land on a PR that's already held. Because of that, the 2026-11-02 run built nothing. Options: (a) merge #13 as is, so the demo goes live and Slice 2 ships with it; (b) let the next run cherry-pick `dde4ddd` (Slice 2) onto a fresh branch from `main` as its own PR, while #13 waits for the go-live call (#13 would still contain Slice 2 until the split PR merges first); (c) leave #13 held and let runs keep appending (Slice 4 next). Recommendation: (a) if you're happy for the demo to be live while the repo is private (its View source link 404s until graduation), otherwise (b). Until you answer, runs leave #13 alone and add no features to it. Also outside this repo: the runner's `holdPaths` for diff-carve should list `.github/workflows/pages.yml`.
-- Answer:
-
-## Answered
+- Answer: Moot: PR #13 merged as is on 2026-11-03, the same as option (a). The demo went live and Slice 2 shipped with it.
+- Applied: 2026-11-11 by the roadmap recheck
 
 ### Where does path-alias resolution go on the roadmap, now that Slice 1's score is in?
 - Asked: 2026-10-14 by diff-carve-roadmap
