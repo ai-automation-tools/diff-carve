@@ -1,23 +1,23 @@
 <h1 align="center">🗺️ Roadmap</h1>
 
 <p align="center">
-  <em>Everything between an empty CLI and a public, demoable DiffCarve, in the order it has to happen.</em>
+  <em>From a public, dry-run DiffCarve to stacked PRs, a merge-blocking check, Python and a Marketplace listing.</em>
 </p>
 
 <p align="center">
-  <img src="https://img.shields.io/badge/now-public_release-F59E0B?style=for-the-badge" alt="Now: Public release">
-  <img src="https://img.shields.io/badge/stage-incubating-2ea44f?style=for-the-badge" alt="Stage: incubating">
+  <img src="https://img.shields.io/badge/now-fast--follow-F59E0B?style=for-the-badge" alt="Now: fast-follow">
+  <img src="https://img.shields.io/badge/stage-public_since_2026--11--03-2ea44f?style=for-the-badge" alt="Stage: public since 2026-11-03">
   <a href="README.md"><img src="https://img.shields.io/badge/↩-docs_home-6B7280?style=for-the-badge" alt="Back to docs"></a>
 </p>
 
 ---
 
-The Diff-Carve Weekly Roadmap routine works this file top to bottom every Monday, Wednesday and Friday: it
-takes the first open item that isn't `🔒 Needs owner` (or up to six `small` ones), builds
-it, ticks it and opens a `roadmap/auto-<date>` PR. **Every item above `## After public
-release` is a release gate.** DiffCarve goes public when all of them are ticked and Mike
-says so. Ticking an item adds its line to the [changelog](CHANGELOG.md) and updates any doc
-it made stale, in the same commit.
+The DiffCarve roadmap routine (`diff-carve-roadmap`) works this file top to bottom, one item per
+run, as `roadmap/auto-` PRs: it takes the first open item that isn't `🔒 Needs owner` (or up to
+six `small` ones), builds it and ticks it. **Every item above `## After public release` is a
+release gate;** all of them were ticked when DiffCarve went public on 2026-11-03. Ticking an
+item adds its line to the [changelog](CHANGELOG.md) and updates any doc it made stale, in the
+same commit.
 
 Markers: `- [ ]` open, `- [-]` claimed by a run in progress, `- [x]` done, `- [!]` blocked
 (the reason follows on the line). `small` marks docs or config a run can batch, up to six
@@ -51,12 +51,16 @@ defaults work without it, and the routine builds it after release.
 - [x] `small` **README usage matches the code.** Every command, flag, config key, and Action input in the README was run against the real build and behaves as written. — done 2026-10-26: every Quick start command, `--dry-run`, `--version`, `--help` and a bad branch run against `dist/` on a scratch clone; the Action's `threshold` input was proven on PR #11; nothing needed changing
 - [x] `small` **Security.** `SECURITY.md` says how to report a vulnerability. A full-history secret scan (`gitleaks detect --log-opts="--all"` or equivalent) comes back clean, and the command and result are recorded in the PR that ticks this box. — done 2026-10-26: `SECURITY.md`; `gitleaks detect --log-opts="--all"` (8.30.1) scanned 22 commits, no leaks found
 - [x] **Live demo at `https://ai-automation-tools.dev/diff-carve/`.** Served by GitHub Pages from this repo through a `actions/deploy-pages` workflow. A visitor picks a bundled sample diff and sees it carved into scored layers with nothing to install. The org source bar sits across the very top, linking `https://github.com/ai-automation-tools/diff-carve`. Safe to publish: the sample diffs come from public open-source PRs or are synthetic. No real personal data, no local paths, and no network call that needs a secret. The README hero's Live Demo badge and nav links resolve to the Pages URL above the fold. — done 2026-10-28: `demo/` and `.github/workflows/pages.yml`; four synthetic sample PRs carved by the real CLI at build time and baked into one static page, `tests/demo.test.ts` checks it; Pages enabled (workflow builds, HTTPS enforced) and the README badge and nav link point at the URL. Only `main` may deploy, so the first live deploy is this item's merge: check the Demo run on `main` goes green and the URL loads
-- [ ] `small` **Move the workflows and `action.yml` off Node 20 action runtimes.** Bump `actions/checkout@v4` and `actions/setup-node@v4` (and `actions/deploy-pages@v4`, `actions/upload-pages-artifact@v3`) to the current majors, which run on `node24`. Why: GitHub removed Node 20 for JavaScript actions on 2026-09-23 and runners already default to Node 24 (https://github.blog/changelog/2026-09-19-deprecation-of-node-20-on-github-actions-runners/); checkout v4.4.0 and setup-node v4 still declare `node20`, while checkout v7.0.1 and setup-node v7.1.0 declare `node24`. Read each major's release notes first: checkout v7 blocks fork-PR checkouts under `pull_request_target` and `workflow_run`, and setup-node v5 turns on automatic package-manager caching when `package.json` has a `packageManager` field. Where: `.github/workflows/ci.yml`, `.github/workflows/diffcarve.yml`, `.github/workflows/pages.yml`, `action.yml` (published Action contract, so the PR is held for review). Done when: CI, the Demo build and the Action's own run on a PR are green on the new versions, and `docs/UPSTREAMS.md` lists the new pins.
-- [ ] `small` **Move ESLint 9 to 10.** Why: eslint.org lists v9 as past its last release (2026-07-10) and v10 as current (https://eslint.org/version-support/); typescript-eslint 8.72.1 declares ESLint `^8.57.0 || ^9.0.0 || ^10.0.0` as a peer. Where: `package.json` (`eslint`, `@eslint/js`), `eslint.config.js`. Do not bump TypeScript: typescript-eslint 8.72.1 still caps it at `<6.1.0` and `typescript` stays at `~6.0`. Done when: `npm run lint`, `npm test` and `npm run build` pass on ESLint 10 with the flat config unchanged or its change explained in the PR.
 
 ## After public release
 
 Nothing below blocks go-live.
+
+### 🛡️ Security and upkeep
+
+- [ ] **Escape the PR comment.** File paths and any repo-supplied text in the dry-run comment are escaped for markdown (backticks, pipes, angle brackets); tests carve a fixture whose path holds a backtick and a pipe and check the comment renders as text. Why: the security sweep (2026-11-10) found markdown injection into the comment through backticks, and the comment is a published Action contract.
+- [ ] `small` **Move the workflows and `action.yml` off Node 20 action runtimes.** Bump `actions/checkout@v4` and `actions/setup-node@v4` (and `actions/deploy-pages@v4`, `actions/upload-pages-artifact@v3`) to the current majors, which run on `node24`. Why: GitHub removed Node 20 for JavaScript actions on 2026-09-23 and runners already default to Node 24 (https://github.blog/changelog/2026-09-19-deprecation-of-node-20-on-github-actions-runners/); checkout v4.4.0 and setup-node v4 still declare `node20`, while checkout v7.0.1 and setup-node v7.1.0 declare `node24`. Read each major's release notes first: checkout v7 blocks fork-PR checkouts under `pull_request_target` and `workflow_run`, and setup-node v5 turns on automatic package-manager caching when `package.json` has a `packageManager` field. Where: `.github/workflows/ci.yml`, `.github/workflows/diffcarve.yml`, `.github/workflows/pages.yml`, `action.yml` (published Action contract, so the PR is held for review). Done when: CI, the Demo build and the Action's own run on a PR are green on the new versions, and `docs/UPSTREAMS.md` lists the new pins.
+- [ ] `small` **Move ESLint 9 to 10.** Why: eslint.org lists v9 as past its last release (2026-07-10) and v10 as current (https://eslint.org/version-support/); typescript-eslint 8.72.1 declares ESLint `^8.57.0 || ^9.0.0 || ^10.0.0` as a peer. Where: `package.json` (`eslint`, `@eslint/js`), `eslint.config.js`. Do not bump TypeScript: typescript-eslint 8.72.1 still caps it at `<6.1.0` and `typescript` stays at `~6.0`. Done when: `npm run lint`, `npm test` and `npm run build` pass on ESLint 10 with the flat config unchanged or its change explained in the PR.
 
 ### 🧩 Fast-follow slices
 
@@ -66,12 +70,17 @@ Nothing below blocks go-live.
 - [ ] **Slice 5: merge-blocking check with override.** A failing layer gets a failing check. A named second reviewer can override it, and the override leaves an audit entry.
 - [ ] **Slice 6: Python support.** A Python analyzer (the `ast` module) passes a smaller spike at a rate comparable to Slice 0's TypeScript results.
 
+### 📚 Docs and agents
+
+- [ ] **Carve pipeline diagram.** An Archify flow in `docs/diagrams/` (merge-base diff → ts-morph import graph with aliases → layers → score → dry-run comment), code-pinned to `src/analyze.ts` and `src/score.ts`, with a builder `--check`; embedded on the homepage in Live mode.
+- [ ] **Agent skill.** `skills/diffcarve/SKILL.md`: before opening a PR over the threshold, run `diffcarve analyze --dry-run` and split along its layers; installable with `npx skills add ai-automation-tools/diff-carve`.
+
 ### 📣 Publish and promote
 
 - [ ] Publish the Action to the GitHub Marketplace. 🔒 Needs owner
 - [ ] Publish the CLI to npm as `diffcarve` (check the name is still free first). 🔒 Needs owner
 - [ ] Launch post with one real before/after carve, sent to the two or three places tech leads running AI agents read. 🔒 Needs owner
-- [ ] Custom subdomain `diff-carve.ai-automation-tools.dev`. 🔒 Needs owner
+- [x] Custom subdomain `diff-carve.ai-automation-tools.dev`. 🔒 Needs owner — done 2026-11-03 at graduation (diff-carve-site; demo on diff-carve-demo).
 
 ### 💰 Revenue
 
