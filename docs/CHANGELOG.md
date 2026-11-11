@@ -16,6 +16,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 ## Unreleased
 
 **Docs**
+- `docs/OPEN-QUESTIONS.md`: the PR #13 question moves to Answered. It was moot once #13 merged on 2026-11-03.
 - Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. The Node 20 Actions and ESLint 10 items move out of Public release (DiffCarve has been public since 2026-11-03) into a new Security and upkeep group, behind a new first item that escapes repo-supplied text in the PR comment. A Docs and agents group adds a carve pipeline diagram and an agent skill.
 - Custom subdomain ticked: since graduation the homepage serves at `https://diff-carve.ai-automation-tools.dev/` (diff-carve-site) and the demo at `https://diff-carve-demo.ai-automation-tools.dev/`. *Publish and promote*
 
