@@ -15,6 +15,11 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Docs**
+- `docs/OPEN-QUESTIONS.md`: the PR #13 question moves to Answered. It was moot once #13 merged on 2026-11-03.
+- Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. The Node 20 Actions and ESLint 10 items move out of Public release (DiffCarve has been public since 2026-11-03) into a new Security and upkeep group, behind a new first item that escapes repo-supplied text in the PR comment. A Docs and agents group adds a carve pipeline diagram and an agent skill.
+- Custom subdomain ticked: since graduation the homepage serves at `https://diff-carve.ai-automation-tools.dev/` (diff-carve-site) and the demo at `https://diff-carve-demo.ai-automation-tools.dev/`. *Publish and promote*
+
 **Changed**
 - `docs/UPSTREAMS.md`: first full check of all rows; the pinned-Actions row now records that checkout, setup-node and deploy-pages v4 still run on Node 20, and the ESLint row records that ESLint 9 is past its last release. Two ROADMAP items queue the Actions bump and the ESLint 10 move.
 
@@ -22,6 +27,7 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - `README.md`: the intro box no longer says "No config file yet"; it points at `diffcarve.yml`, which the Features table and the `diffcarve.yml` entry under **Added** call built.
 
 **Added**
+- Stacked PR chains: the Action's new `dry-run` input (`true` by default). Set to `false`, with `contents: write`, it builds one `diffcarve/<pr>/layer-<n>` branch per layer through the Git Data API, opens a PR per layer based on the one below, joins them with GitHub's Stacks API, and names the stack in its comment. Once per PR; nothing is merged, closed or approved. `src/stack.ts`, `tests/stack.test.ts`. This repo's own workflow stays on dry run. *Fast-follow: Slice 4*
 - `docs/UPSTREAMS.md` and `.github/dependabot.yml`: the upstream worklist for the biweekly upstream check, and weekly grouped minor/patch Dependabot updates for npm and GitHub Actions.
 - `diffcarve.yml`: the trigger threshold, the pass line, the four score budgets (lines, files, complexity, reverse deps) and per-language `exclude` globs, all optional over documented defaults and read from the branch the PR targets. Unknown keys and wrong types fail with the key named. The Action's `threshold` input now defaults to empty, so the config's value applies unless the input is set. Adds the `yaml` dependency. *Fast-follow: Slice 2*
 - Live demo at https://ai-automation-tools.dev/diff-carve/: pick one of four synthetic sample PRs (a layered feature, path aliases with a failing layer, two unrelated changes, a one-file fix) and see its layers, scores, the PR comment the Action would post, the CLI output and the diff. `demo/build.ts` (`npm run demo`) carves the samples with the real CLI at build time; the page is static, in the org house style with the source bar on top. `.github/workflows/pages.yml` builds it on every PR and deploys it to GitHub Pages from `main`. The README carries a Live Demo badge and nav link. *Public release: Live demo*
