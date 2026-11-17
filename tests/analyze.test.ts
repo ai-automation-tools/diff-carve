@@ -1,8 +1,9 @@
 import { test } from "node:test";
 import assert from "node:assert/strict";
+import { execFileSync } from "node:child_process";
 import { rmSync } from "node:fs";
 import { analyze, layer } from "../src/analyze.ts";
-import { run } from "../src/run.ts";
+import { code, markdown, run } from "../src/run.ts";
 import { DEFAULTS } from "../src/config.ts";
 import { complexity, scoreLayers } from "../src/score.ts";
 import { fixtureRepo } from "./fixture.ts";
@@ -181,6 +182,34 @@ test("--dry-run prints the stack as PR-comment markdown", () => {
 test("--dry-run on an empty or one-file diff still says there is nothing to partition", () => {
   assert.match(cli(["analyze", "empty", "--dry-run"]).out, /Nothing to partition\./);
   assert.equal(cli(["analyze", "single", "--dry-run"]).out, "single changes one file (src/one.ts). Nothing to partition.\n");
+});
+
+test("code() fences repo text so backticks, pipes, tags and newlines render as text", () => {
+  assert.equal(code("src/a.ts"), "`src/a.ts`");
+  assert.equal(code("a`b|<i>c"), "``a`b|<i>c``");
+  assert.equal(code("`a``"), "``` `a`` ```");
+  assert.equal(code(" a "), "`  a  `");
+  assert.equal(code("a\n\n# b\t"), "`a\\u000a\\u000a# b\\u0009`");
+});
+
+test("--dry-run keeps a path or branch name holding backticks, pipes and tags inside its code span", () => {
+  // Windows can't write `|` or `<` in a file name, so the commit is built with git plumbing,
+  // and core.protectNTFS lets Git for Windows put such a path in the index.
+  const dir = fixtureRepo({});
+  const git = (args: string[], input?: string) =>
+    execFileSync("git", ["-c", "user.name=t", "-c", "user.email=t@example.com", "-c", "core.protectNTFS=false", ...args], { cwd: dir, encoding: "utf8", input }).trim();
+  const evil = "src/a`b|c<img src=x>.ts";
+  const files = { "src/base.ts": "export const b = 1;\n", [evil]: 'import { b } from "./base.ts";\nexport const a = b;\n', "docs/x\n\n# y.md": "doc\n" };
+  git(["update-index", "-z", "--index-info"], Object.entries(files).map(([p, t]) => `100644 ${git(["hash-object", "-w", "--stdin"], t)}\t${p}\0`).join(""));
+  const head = git(["commit-tree", git(["write-tree"]), "-p", "main", "-m", "evil"]);
+  // The branch name comes from the PR event, as the Action passes it; git allows these characters.
+  const out = markdown({ ...analyze(dir, head, "main"), branch: "x`|<b>y" }, 0);
+  rmSync(dir, { recursive: true, force: true });
+  assert.match(out, /\n``x`\|<b>y`` changes 3 files since /);
+  assert.match(out, /<summary>Layer 2<\/summary>\n\n- ``src\/a`b\|c<img src=x>\.ts``\n\n<\/details>/);
+  assert.match(out, /\nOutside the import graph: `docs\/x\\u000a\\u000a# y\.md`\n/);
+  // The score table's rows hold numbers only, so no pipe in a path can add a cell.
+  for (const row of out.split("\n").filter((l) => /^\| \d/.test(l))) assert.equal(row.split("|").length, 8);
 });
 
 test("analyze rejects a second branch", () => {
