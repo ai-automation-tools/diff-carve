@@ -85,6 +85,18 @@ export function format(a: Analysis, seconds: number, config: Config = DEFAULTS):
 
 const signed = (n: number) => (n > 0 ? `+${n}` : `${n}`);
 
+// Repo text (a path, a branch name) as a markdown code span that renders as text whatever it holds:
+// the fence is one backtick longer than any run inside, a space pads a leading or trailing backtick,
+// and control characters show as \uXXXX, since a blank line would end the span early. Pipes and
+// angle brackets are literal in a code span; a pipe would only split a table cell, and the score
+// table holds numbers only.
+export function code(s: string): string {
+  s = s.replace(/\p{Cc}/gu, (c) => `\\u${c.charCodeAt(0).toString(16).padStart(4, "0")}`);
+  const fence = "`".repeat(Math.max(0, ...(s.match(/`+/g) ?? []).map((r) => r.length)) + 1);
+  const pad = /^[` ]|[` ]$/.test(s) ? " " : "";
+  return `${fence}${pad}${s}${pad}${fence}`;
+}
+
 // The proposed stack as the body of a PR comment. Blocks nothing, approves nothing.
 export function markdown(a: Analysis, seconds: number, config: Config = DEFAULTS): string {
   if (a.changed.length < 2) return format(a, seconds, config);
@@ -93,16 +105,16 @@ export function markdown(a: Analysis, seconds: number, config: Config = DEFAULTS
   const scores = scoreLayers(a, config);
   const failing = scores.filter((l) => !l.pass).length;
   let s = `### DiffCarve: ${a.layers.length} layers proposed\n\n`;
-  s += `\`${a.branch}\` changes ${a.changed.length} files since \`${a.mergeBase.slice(0, 7)}\`. `;
+  s += `${code(a.branch)} changes ${a.changed.length} files since \`${a.mergeBase.slice(0, 7)}\`. `;
   s += failing ? `${failing} of ${a.layers.length} layers score under ${pass}.\n\n` : `Every layer scores ${pass} or more.\n\n`;
   s += "| Layer | Score | Lines | Files | Complexity Δ | Reverse deps |\n|--:|--:|--:|--:|--:|--:|\n";
   scores.forEach((l: LayerScore, i) => {
     s += `| ${i + 1} | ${l.score} ${l.pass ? "✅" : "❌"} | ${l.lines} | ${l.files} | ${signed(l.complexity)} | ${l.reverseDeps} |\n`;
   });
   a.layers.forEach((files, i) => {
-    s += `\n<details><summary>Layer ${i + 1}</summary>\n\n${files.map((f) => `- \`${f}\``).join("\n")}\n\n</details>\n`;
+    s += `\n<details><summary>Layer ${i + 1}</summary>\n\n${files.map((f) => `- ${code(f)}`).join("\n")}\n\n</details>\n`;
   });
-  if (a.outside.length) s += `\nOutside the import graph: ${a.outside.map((f) => `\`${f}\``).join(", ")}\n`;
+  if (a.outside.length) s += `\nOutside the import graph: ${a.outside.map(code).join(", ")}\n`;
   s += `\nEach input spends its share of 100 points as it climbs from 0 to twice its budget: `;
   s += `lines ${w.lines} (budget ${b.lines}), files ${w.files} (${b.files}), `;
   s += `complexity ${w.complexity} (${b.complexity}), reverse deps ${w.reverseDeps} (${b.reverseDeps}). `;

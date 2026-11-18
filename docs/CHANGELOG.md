@@ -15,6 +15,9 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+**Security**
+- The dry-run comment and the layer PRs' bodies escape repo-supplied text. Every path and the branch name goes through `code()` in `src/run.ts`: a code span whose fence outruns any backtick inside, with control characters shown as `\uXXXX`, so a path or branch holding backticks, pipes, tags or newlines can't break out into markdown or HTML. *Security and upkeep*
+
 **Docs**
 - `docs/OPEN-QUESTIONS.md`: the PR #13 question moves to Answered. It was moot once #13 merged on 2026-11-03.
 - Roadmap rechecked against the org's 2026-11 requirements. The intro names the routine instead of its days and the badges say public. The Node 20 Actions and ESLint 10 items move out of Public release (DiffCarve has been public since 2026-11-03) into a new Security and upkeep group, behind a new first item that escapes repo-supplied text in the PR comment. A Docs and agents group adds a carve pipeline diagram and an agent skill.
