@@ -1,5 +1,6 @@
 import { execFileSync } from "node:child_process";
 import type { Analysis } from "./analyze.ts";
+import { code } from "./run.ts";
 
 // One GitHub REST call: a path under /repos/{owner}/{repo}, a method and an optional JSON body.
 export type Call = (path: string, method?: string, body?: unknown, headers?: Record<string, string>) => Promise<Response>;
@@ -54,7 +55,7 @@ export async function openStack(cwd: string, a: Analysis, pr: Pr, call: Call): P
     const head = branchFor(pr.number, i + 1);
     res = await call("/git/refs", "POST", { ref: `refs/heads/${head}`, sha: parent });
     if (!res.ok) return { res, what: `create branch ${head}` };
-    const body = `Layer ${n} carved from #${pr.number} by DiffCarve, in dependency order: nothing here imports from a later layer.\n\n${files.map((f) => `- \`${f}\``).join("\n")}\n`;
+    const body = `Layer ${n} carved from #${pr.number} by DiffCarve, in dependency order: nothing here imports from a later layer.\n\n${files.map((f) => `- ${code(f)}`).join("\n")}\n`;
     res = await call("/pulls", "POST", { title: `${pr.title ?? `#${pr.number}`} (layer ${n})`, head, base, body });
     if (!res.ok) return { res, what: `open layer ${n}'s PR` };
     prs.push(((await res.json()) as { number: number }).number);
