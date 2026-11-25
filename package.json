@@ -25,7 +25,7 @@
     "@types/node": "^22.20.5",
     "eslint": "^9.39.5",
     "typescript": "~6.0",
-    "typescript-eslint": "^8.72.2"
+    "typescript-eslint": "^8.73.0"
   },
   "dependencies": {
     "ts-morph": "^28.0.0",
