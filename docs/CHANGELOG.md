@@ -15,6 +15,8 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 
 ## Unreleased
 
+- `CLAUDE.md` is gone: Claude Code reads `AGENTS.md` directly.
+
 **Security**
 - The dry-run comment and the layer PRs' bodies escape repo-supplied text. Every path and the branch name goes through `code()` in `src/run.ts`: a code span whose fence outruns any backtick inside, with control characters shown as `\uXXXX`, so a path or branch holding backticks, pipes, tags or newlines can't break out into markdown or HTML. *Security and upkeep*
 

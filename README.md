@@ -158,7 +158,7 @@ languages:
 | [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
 | [**🎓 skills/**](skills/diff-carve/SKILL.md) | The `diff-carve` agent skill: how a coding agent installs DiffCarve, runs it and reads its output in any repo. Install it with `npx skills add ai-automation-tools/diff-carve`, or copy the folder into your agent's skills directory. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability privately. |
-| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. Claude Code reads it directly too. |
 
 ---
 
