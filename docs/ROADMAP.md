@@ -73,7 +73,7 @@ Nothing below blocks go-live.
 ### 📚 Docs and agents
 
 - [ ] **Carve pipeline diagram.** An Archify flow in `docs/diagrams/` (merge-base diff → ts-morph import graph with aliases → layers → score → dry-run comment), code-pinned to `src/analyze.ts` and `src/score.ts`, with a builder `--check`; embedded on the homepage in Live mode.
-- [ ] **Agent skill.** `skills/diffcarve/SKILL.md`: before opening a PR over the threshold, run `diffcarve analyze --dry-run` and split along its layers; installable with `npx skills add ai-automation-tools/diff-carve`.
+- [x] **Agent skill.** `skills/diff-carve/SKILL.md`: before opening a PR over the threshold, run `diffcarve analyze --dry-run` and split along its layers; installable with `npx skills add ai-automation-tools/diff-carve`. — done 2026-11-27: folder named after the repo (`diff-carve`); covers install from source, the CLI, its output and exit codes, the score, `diffcarve.yml` and the Action; `npx skills add . --list` finds it locally, and the remote install works once it is on `main`
 
 ### 📣 Publish and promote
 
