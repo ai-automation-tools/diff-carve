@@ -104,7 +104,7 @@ jobs:
   carve:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v7
         with:
           fetch-depth: 0 # the merge base has to be in the clone
       - uses: ai-automation-tools/diff-carve@main

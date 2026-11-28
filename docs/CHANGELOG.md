@@ -28,6 +28,8 @@ Entries that close a roadmap item carry the roadmap phase in italics.
 - Custom subdomain ticked: since graduation the homepage serves at `https://diff-carve.ai-automation-tools.dev/` (diff-carve-site) and the demo at `https://diff-carve-demo.ai-automation-tools.dev/`. *Publish and promote*
 
 **Changed**
+- The workflows and `action.yml` run on Node 24 action runtimes: `actions/checkout@v7`, `actions/setup-node@v7`, `actions/upload-pages-artifact@v5` and `actions/deploy-pages@v5`, up from v4/v4/v3/v4 on Node 20. The README's workflow example pins `checkout@v7` too, and `docs/UPSTREAMS.md` lists the new pins. *Security and upkeep*
+- Lint runs on ESLint 10 (`eslint` and `@eslint/js` `^10`), up from 9, which is past its last release. The flat config needed no change. *Security and upkeep*
 - `docs/UPSTREAMS.md`: first full check of all rows; the pinned-Actions row now records that checkout, setup-node and deploy-pages v4 still run on Node 20, and the ESLint row records that ESLint 9 is past its last release. Two ROADMAP items queue the Actions bump and the ESLint 10 move.
 
 **Fixed**
