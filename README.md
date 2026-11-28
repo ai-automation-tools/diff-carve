@@ -156,8 +156,9 @@ languages:
 | [**⚙️ action.yml**](action.yml) | The GitHub Action. [`.github/workflows/diffcarve.yml`](.github/workflows/diffcarve.yml) runs it on this repo's own PRs; [`ci.yml`](.github/workflows/ci.yml) builds, tests and lints every push and PR. |
 | [**🎬 demo/**](demo/) | The live demo: sample PRs, the page template, and `build.ts`, which carves the samples with the real CLI. [`pages.yml`](.github/workflows/pages.yml) builds it on every PR and deploys it to GitHub Pages from `main`. |
 | [**🧪 tests/**](tests/) | Tests for `node --test`, run straight from TypeScript. |
+| [**🎓 skills/**](skills/diff-carve/SKILL.md) | The `diff-carve` agent skill: how a coding agent installs DiffCarve, runs it and reads its output in any repo. Install it with `npx skills add ai-automation-tools/diff-carve`, or copy the folder into your agent's skills directory. |
 | [**🔒 SECURITY.md**](SECURITY.md) | How to report a vulnerability privately. |
-| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. `CLAUDE.md` imports it for Claude Code. |
+| [**🤖 AGENTS.md**](AGENTS.md) | Standing orders for the agent that works the roadmap each week. Claude Code reads it directly too. |
 
 ---
 
